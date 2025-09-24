@@ -18,6 +18,8 @@ def txt_info(label, value):
 
 
 def clearTemp():
+    
+
     clearUserTemp = subprocess.run(
         ["powershell", "-Command", "Remove-Item -Path \"$env:TEMP\\*\" -Recurse -Force -ErrorAction SilentlyContinue"],
         capture_output=True, text=True
