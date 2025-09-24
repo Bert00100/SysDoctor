@@ -1,11 +1,9 @@
 import subprocess
 import os
 import platform
-import wmi
 import psutil
 import socket
 from colorama import Fore, Style, init
-
 
 # Inicializa suporte a cores no terminal
 init(autoreset=True)
@@ -18,15 +16,15 @@ def txt_info(label, value):
 
 def dnsOtm():
     flushDNS = subprocess.run(
-        ["powershell", "-Commnad", "ipconfig /flushdns"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "ipconfig /flushdns"],
+        capture_output=True,
+        text=True
     )
 
     reRegistDNS = subprocess.run(
-        ["powershell", "-Commnad", "ipconfig /registerdns"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "ipconfig /registerdns"],
+        capture_output=True,
+        text=True
     )
 
     erros = []
@@ -34,34 +32,35 @@ def dnsOtm():
         erros.append("Limpar DNS")
     if reRegistDNS.stderr.strip():
         erros.append("Re-Registro de DNS")
+
     if erros:
         return f"Ocorreu um erro ao limpar: {', '.join(erros)}"
     else:
-        txt_info("Ajuste de DNS ok")
+        print("DNS", "Ajuste de DNS ok")
 
 def ipOtm():
     renIP_rel = subprocess.run(
-        ["powershell", "-Commnad", "ipconfig /release"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "ipconfig /release"],
+        capture_output=True,
+        text=True
     )
 
     renIP_ren = subprocess.run(
-        ["powershell", "-Commnad", "ipconfig /renew"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "ipconfig /renew"],
+        capture_output=True,
+        text=True
     )
 
     restTcpIP = subprocess.run(
-        ["powershell", "-Commnad", "netsh int ip reset"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "netsh int ip reset"],
+        capture_output=True,
+        text=True
     )
 
     resetWiSock = subprocess.run(
-        ["powershell", "-Commnad", "netsh winsock reset"],
-        capture_output = True,
-        text = True
+        ["powershell", "-Command", "netsh winsock reset"],
+        capture_output=True,
+        text=True
     )
 
     erros = []
@@ -77,7 +76,7 @@ def ipOtm():
     if erros:
         return f"Ocorreu um erro ao limpar: {', '.join(erros)}"
     else:
-        txt_info("Ajuste de IP ok")
+        print("IP", "Ajuste de IP ok")
 
-print(dnsOtm())
-print(ipOtm())
+dnsOtm()
+ipOtm()
