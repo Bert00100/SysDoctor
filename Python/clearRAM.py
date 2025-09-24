@@ -1,4 +1,21 @@
 import subprocess
+import os
+import platform
+import wmi
+import psutil
+import socket
+from colorama import Fore, Style, init
+
+
+# Inicializa suporte a cores no terminal
+init(autoreset=True)
+
+def header(title):
+    print(Fore.CYAN + f"\n=== {title} ===" + Style.RESET_ALL)
+
+def txt_info(label, value):
+    print(Fore.YELLOW + f"{label:<30}: " + Style.RESET_ALL + f"{value}")
+
 
 def clearTemp():
     clearUserTemp = subprocess.run(
@@ -17,6 +34,7 @@ def clearTemp():
     )
 
     erros = []
+    #stderr e uma fincao da biblioteca subprocess que mostra se teve erro
     if clearUserTemp.stderr.strip():
         erros.append("Temp do Usuário")
     if clearSysTemp.stderr.strip():
