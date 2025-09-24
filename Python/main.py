@@ -1,0 +1,33 @@
+import os
+import platform
+import wmi
+import psutil
+import socket
+from colorama import Fore, Style, init
+
+# Inicializa suporte a cores no terminal
+init(autoreset=True)
+
+def write_header(title):
+    print(Fore.CYAN + f"\n=== {title} ===" + Style.RESET_ALL)
+
+def write_info(label, value):
+    print(Fore.YELLOW + f"{label:<30}: " + Style.RESET_ALL + f"{value}")
+
+write_header("Informações do Sistema")
+write_info("Nome da Máquina", platform.node())
+write_info("Nome do Usuário", os.getlogin())
+write_info("Versão do Sistema Operacional", platform.platform())
+
+write_header("Informações da BIOS")
+c = wmi.WMI()
+for bios in c.Win32_BIOS():
+    write_info("Serial Number", bios.SerialNumber if bios.SerialNumber else "N/A")
+
+write_header("Informações da Placa de Rede")
+ip_interfaces = psutil.net_if_addrs()
+
+for interface_name, addresses in ip_interfaces.items():
+    for address in addresses:
+        if address.family == socket.AF_INET:  # Se for IPv4
+            write_info(f"Interface: {interface_name}", address.address)
