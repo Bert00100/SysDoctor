@@ -36,7 +36,7 @@ def dnsOtm():
     if erros:
         return f"Ocorreu um erro ao limpar: {', '.join(erros)}"
     else:
-        print("DNS", "Ajuste de DNS ok")
+        txt_info("DNS", "Ajuste de DNS ok")
 
 def ipOtm():
     renIP_rel = subprocess.run(
@@ -76,7 +76,10 @@ def ipOtm():
     if erros:
         return f"Ocorreu um erro ao limpar: {', '.join(erros)}"
     else:
-        print("IP", "Ajuste de IP ok")
+        txt_info("IP", "Ajuste de IP ok")
+
+
 
 dnsOtm()
 ipOtm()
+
