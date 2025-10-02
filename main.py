@@ -55,6 +55,18 @@ def run_as_admin():
         debug_error(f"Falha ao solicitar privilégios: {e}")
         return False
 
+def perguntar_continuar():
+    """Pergunta se deseja voltar ao menu ou sair"""
+    print("\n" + "="*50)
+    print(Fore.CYAN + "1 - Voltar ao Menu Principal" + Style.RESET_ALL)
+    print(Fore.CYAN + "0 - Sair" + Style.RESET_ALL)
+    opcao = input(Fore.YELLOW + "\nEscolha uma opção: " + Style.RESET_ALL)
+    
+    if opcao == "0":
+        print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
+        sys.exit(0)
+    # Se for "1" ou qualquer outra coisa, volta ao menu
+
 # ========== FUNÇÕES PRINCIPAIS ==========
 
 def clearDisk():
@@ -282,31 +294,149 @@ def limparSistema():
         debug_success("Limpeza completa finalizada!")
         return "Limpeza concluída com sucesso (Temp + RAM)"
 
-# ========== MENU PRINCIPAL ==========
+def otmNet():
+    """Otimiza e limpa configurações de rede"""
+    header("LIMPEZA DE REDE")
+    
+    # Verifica privilégios de administrador
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de rede requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
 
-header("Reparo e Otimização de Windows")
-print("Selecione a Opção que você quer realizar")
+    erros = []
 
-# Opções de execução
-print("1 - Imformação da Maquina")
-print("2 - Limpar SSD/HD")
-print("3 - Scaner do Windows")
-print("4 - Limpar Memoria RAM")
-print("5 - Fechar Terminal")
+    debug_step(2, "Limpando DNS da máquina...")
+    flushDNS = subprocess.run(
+        ["powershell", "-Command", "ipconfig /flushdns"],
+        capture_output=True,
+        text=True
+    )
 
-op = input("Qual Opcão Você Deseja Executar: ")
+    if flushDNS.stderr.strip():
+        erros.append("Flush DNS")
+        debug_error("Erro ao limpar o DNS da máquina")
+    else:
+        debug_success("Limpeza do DNS realizada com sucesso!")
+    
+    debug_step(3, "Re-register do DNS...")
+    reRegistDNS = subprocess.run(
+        ["powershell", "-Command", "ipconfig /registerdns"],
+        capture_output=True,
+        text=True
+    )
 
-if op == "1":
-    infoMachine()
-elif op == "2":
-    clearDisk()
-elif op == "3":
-    scanWin()
-elif op == "4":
-    resultado = limparSistema()
-    print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
-elif op == "5":
-    print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
-    sys.exit(0)
-else:
-    print(Fore.RED + "Opção inválida!" + Style.RESET_ALL)
+    if reRegistDNS.stderr.strip():
+        erros.append("Re-Register do DNS")
+        debug_error("Erro ao fazer o re-register da máquina")
+    else:
+        debug_success("Re-register da máquina feito com sucesso!")
+
+    debug_step(4, "Fazendo release do IP...")
+    renIP_rel = subprocess.run(
+        ["powershell", "-Command", "ipconfig /release"],
+        capture_output=True,
+        text=True
+    )
+
+    if renIP_rel.stderr.strip():
+        erros.append("Release IP")
+        debug_error("Aviso ao executar release do IP")
+    else:
+        debug_success("Release do IP executado!")
+
+    debug_step(5, "Renew do IP...")
+    renIP_ren = subprocess.run(
+        ["powershell", "-Command", "ipconfig /renew"],
+        capture_output=True,
+        text=True
+    )
+
+    if renIP_ren.stderr.strip():
+        erros.append("Renew do IP")
+        debug_error("Aviso ao executar o renew do IP")
+    else:
+        debug_success("Renew do IP feito!")
+    
+    debug_step(6, "Reset de IP...")
+    restTcpIP = subprocess.run(
+        ["powershell", "-Command", "netsh int ip reset"],
+        capture_output=True,
+        text=True
+    )
+
+    if restTcpIP.stderr.strip():
+        erros.append("Reset de IP")
+        debug_error("Aviso ao resetar IP")
+    else:
+        debug_success("Reset do IP feito!")
+    
+    debug_step(7, "Reset do Winsock...")
+    resetWiSock = subprocess.run(
+        ["powershell", "-Command", "netsh winsock reset"],
+        capture_output=True,
+        text=True
+    )
+
+    if resetWiSock.stderr.strip():
+        erros.append("Reset do WinSock")
+        debug_error("Aviso ao resetar o WinSock")
+    else:
+        debug_success("Reset do Winsock feito com sucesso!")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Limpeza de rede concluída!")
+        return "Limpeza da Rede WiFi/Ethernet concluída"
+
+def mostrar_menu():
+    """Exibe o menu principal"""
+    header("Reparo e Otimização de Windows")
+    print("Selecione a opção que você quer realizar\n")
+    print("1 - Informação da Máquina")
+    print("2 - Limpar SSD/HD")
+    print("3 - Scanner do Windows")
+    print("4 - Limpar Memória RAM")
+    print("5 - Otimizar WiFi/Ethernet")
+    print("0 - Fechar Terminal")
+
+# ========== LOOP PRINCIPAL ==========
+
+while True:
+    mostrar_menu()
+    op = input(Fore.YELLOW + "\nQual opção você deseja executar: " + Style.RESET_ALL)
+
+    if op == "1":
+        infoMachine()
+        perguntar_continuar()
+    elif op == "2":
+        clearDisk()
+        perguntar_continuar()
+    elif op == "3":
+        resultado = scanWin()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op == "4":
+        resultado = limparSistema()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op == "5":
+        resultado = otmNet()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op == "0":
+        print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
+        sys.exit(0)
+    else:
+        print(Fore.RED + "Opção inválida!" + Style.RESET_ALL)
+        perguntar_continuar()
