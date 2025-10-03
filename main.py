@@ -171,6 +171,20 @@ def infoMachine():
 def scanWin():
     """Executa scan e reparo do Windows com DISM"""
     header("Scan e Reparo do Windows (DISM)")
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
     
     debug_step(1, "Iniciando DISM /RestoreHealth...")
     debug_warning("Este processo pode levar vários minutos")
