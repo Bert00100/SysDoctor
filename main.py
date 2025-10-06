@@ -308,7 +308,7 @@ def limparSistema():
         debug_success("Limpeza completa finalizada!")
         return "Limpeza concluída com sucesso (Temp + RAM)"
 
-def otmNet():
+def clearNet():
     """Otimiza e limpa configurações de rede"""
     header("LIMPEZA DE REDE")
     
@@ -413,16 +413,42 @@ def otmNet():
         debug_success("Limpeza de rede concluída!")
         return "Limpeza da Rede WiFi/Ethernet concluída"
 
+    def testPing():
+        erros = []
+        
+        debug_step(1, "Ping do DNS Google..")
+        pingGoogle = subprocess.run(
+            ["powershell", "-Command", "ping 8.8.8.8"],
+            capture_output=True,
+            text=True
+        )
+
+        if pingGoogle.stderr.strip():
+            erros.append("Erro ao pingar DNS Google")
+        else:
+            debug_success("Ping bem sucedido")
+    
+
 def mostrar_menu():
     """Exibe o menu principal"""
     header("Reparo e Otimização de Windows")
     print("Selecione a opção que você quer realizar\n")
-    print("1 - Informação da Máquina")
-    print("2 - Limpar SSD/HD")
-    print("3 - Scanner do Windows")
-    print("4 - Limpar Memória RAM")
-    print("5 - Otimizar WiFi/Ethernet")
-    print("0 - Fechar Terminal")
+    print("[1] - Informação da Máquina")
+    print("[2] - Limpar SSD/HD")
+    print("[3] - Scanner do Windows")
+    print("[4] - Limpar Memória RAM")
+    print("[5] - Limpar Cacches de Wifi/Eternet")
+    print("[6] - Otimizar Wifi")
+    #print("[7] - Otimizar Pin")
+    #print("[8] - Teste de Ping")
+    #print("[9] - Mapa de conexão")
+    #print("[10] - Verificar Temperatura")
+    #print("[11] - Otimizar Windows")
+    #print("[12] - Criar Ponsto de Restauração")
+    #print("[13] - Configuraçãp pós-instalação")
+    
+    print(" ")
+    print("[0] - Fechar Terminal")
 
 # ========== LOOP PRINCIPAL ==========
 
@@ -445,7 +471,11 @@ while True:
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "5":
-        resultado = otmNet()
+        resultado = clearNet()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="6":
+        resultado = testPing()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "0":
