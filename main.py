@@ -413,20 +413,24 @@ def clearNet():
         debug_success("Limpeza de rede concluída!")
         return "Limpeza da Rede WiFi/Ethernet concluída"
 
-    def testPing():
-        erros = []
-        
-        debug_step(1, "Ping do DNS Google..")
-        pingGoogle = subprocess.run(
-            ["powershell", "-Command", "ping 8.8.8.8"],
-            capture_output=True,
-            text=True
-        )
+def testPing():
 
-        if pingGoogle.stderr.strip():
-            erros.append("Erro ao pingar DNS Google")
-        else:
-            debug_success("Ping bem sucedido")
+    header("Teste de Ping")
+
+    erros = []
+        
+    debug_step(1, "Ping do DNS Google..")
+    pingGoogle = subprocess.run(
+    ["powershell", "-Command", "ping 8.8.8.8"],
+       capture_output=True,
+       text=True
+    )
+
+    if pingGoogle.stderr.strip():
+        erros.append("Erro ao pingar DNS Google")
+    else:
+        print(pingGoogle.stdout)
+        debug_success("Ping bem sucedido")
     
 
 def mostrar_menu():
@@ -438,9 +442,9 @@ def mostrar_menu():
     print("[3] - Scanner do Windows")
     print("[4] - Limpar Memória RAM")
     print("[5] - Limpar Cacches de Wifi/Eternet")
-    print("[6] - Otimizar Wifi")
-    #print("[7] - Otimizar Pin")
-    #print("[8] - Teste de Ping")
+    print("[6] - Teste de Ping")
+    #print("[7] - Otimizar Ping")
+    #print("[8] - Otimizr Wifi")
     #print("[9] - Mapa de conexão")
     #print("[10] - Verificar Temperatura")
     #print("[11] - Otimizar Windows")
