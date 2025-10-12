@@ -431,7 +431,84 @@ def testPing():
     else:
         print(pingGoogle.stdout)
         debug_success("Ping bem sucedido")
+
+def otmPing():
+    erros = []
+    header("Otimizar Ping")
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    debug_step(2, "Procurando Jumper DNS...")
+    dnsJu_path = os.path.join("Scripts", "Apps", "DNS", "DnsJumper.exe")
+
+    if not os.path.exists(dnsJu_path):
+        debug_error(f"DNS Jumper não encontrado em: {dnsJu_path}")
+        erros.append("DNS Jumper não encontrado")
+    else:
+        debug_success(f"DNS Jumper encontrado: {dnsJu_path}")
+
+        debug_step(3, "Executando DNS JUMPER...")
+        starDNS = subprocess.run(
+            [dnsJu_path],
+            capture_output=True,
+            text= True,
+            check=False
+        )
+
+        debug_step(4, "Finalizando DNS Jumper")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Otimização finalizada!")
+        return "Otimização de Ping"
+
+def mapNet():
+    header("Mapa de conexão")
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
     
+    erros = []
+
+    debug_step(2, "Localizar Servidor")
+    net = input("Digite o Servidor que deseja Mapear: ")
+
+    debug_step(3, "Mapeando a rede...")
+    trackNet = subprocess.run(
+        ["powershell", "-Command", f"tracert {net}"],
+        capture_output=True,
+        text=True
+    )
+
+    if trackNet.stderr.strip():
+        erros.append("Servidor não encontrado")
+        debug_error("Erro ao mapear o Servidor")
+    else:
+        print(trackNet.stdout)
+        debug_success("Servidor Mapeado com sucesso")
 
 def mostrar_menu():
     """Exibe o menu principal"""
@@ -443,9 +520,9 @@ def mostrar_menu():
     print("[4] - Limpar Memória RAM")
     print("[5] - Limpar Cacches de Wifi/Eternet")
     print("[6] - Teste de Ping")
-    #print("[7] - Otimizar Ping")
+    print("[7] - Otimizar Ping")
     #print("[8] - Otimizr Wifi")
-    #print("[9] - Mapa de conexão")
+    print("[9] - Mapa de conexão")
     #print("[10] - Verificar Temperatura")
     #print("[11] - Otimizar Windows")
     #print("[12] - Criar Ponsto de Restauração")
@@ -480,6 +557,14 @@ while True:
         perguntar_continuar()
     elif op =="6":
         resultado = testPing()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="7":
+        resultado = otmPing()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="9":
+        resultado = mapNet()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "0":
