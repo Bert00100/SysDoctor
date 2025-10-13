@@ -526,7 +526,7 @@ def mostrar_menu():
     #print("[10] - Verificar Temperatura")
     #print("[11] - Otimizar Windows")
     #print("[12] - Criar Ponsto de Restauração")
-    #print("[13] - Configuraçãp pós-instalação")
+    #print("[13] - Configuração pós-instalação")
     
     print(" ")
     print("[0] - Fechar Terminal")
