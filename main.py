@@ -433,7 +433,6 @@ def testPing():
         debug_success("Ping bem sucedido")
 
 def otmPing():
-    erros = []
     header("Otimizar Ping")
     debug_step(1, "Verificando privilégios de administrador...")
     if not is_admin():
@@ -449,6 +448,7 @@ def otmPing():
     else:
         debug_success("Privilégios de administrador confirmados")
 
+    erros = []
     debug_step(2, "Procurando Jumper DNS...")
     dnsJu_path = os.path.join("Scripts", "Apps", "DNS", "DnsJumper.exe")
 
@@ -510,6 +510,70 @@ def mapNet():
         print(trackNet.stdout)
         debug_success("Servidor Mapeado com sucesso")
 
+def restartPoint():
+    header("Criando Ponto de Restauração")
+
+    erros = []
+
+    debug_step(1, "Executando ferramente de ponto de Restauração")
+    point = subprocess.run(
+        ["SystemPropertiesProtection.exe"],
+        shell=True, 
+        capture_output= True, 
+        text= True
+    )
+
+    if point.stderr.strip():
+        erros.append("Execução de Ponto de Restauração")
+        debug_error("Erro ao executar ponto de restauração")
+    else:
+        debug_success("Ponto de Restauração Criado.")
+
+def temperatureMonitor():
+    header("Monitor de Temperatura")
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    debug_step(2, "Procurando Monitor de Temperatura")
+    hardMonitor_path = os.path.join("Scripts", "Apps", "HardwareMonitor", "OpenHardwareMonitor.exe")
+
+    if not os.path.exists(hardMonitor_path):
+        debug_error(f"Sistema de Monitoramento não encontrado em: {hardMonitor_path}")
+        erros.append("Hardower Monitor não encontrado")
+    else:
+        debug_success(f"Sistema de Monitoramento encontrado: {hardMonitor_path}")
+
+        debug_step(3, "Executando Sistema de Monitoramento...")
+        startHardMonitor = subprocess.run(
+            [hardMonitor_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        debug_step(5, "Finalizando Sistema de Monitoramento")
+        
+    
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Sistema de monitoramento Finalizado")
+        return "Sistema Finalizado"
+
 def mostrar_menu():
     """Exibe o menu principal"""
     header("Reparo e Otimização de Windows")
@@ -523,9 +587,9 @@ def mostrar_menu():
     print("[7] - Otimizar Ping")
     #print("[8] - Otimizr Wifi")
     print("[9] - Mapa de conexão")
-    #print("[10] - Verificar Temperatura")
+    print("[10] - Verificar Temperatura")
     #print("[11] - Otimizar Windows")
-    #print("[12] - Criar Ponsto de Restauração")
+    print("[12] - Criar Ponsto de Restauração")
     #print("[13] - Configuração pós-instalação")
     
     print(" ")
@@ -565,6 +629,14 @@ while True:
         perguntar_continuar()
     elif op =="9":
         resultado = mapNet()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="10":
+        resultado = temperatureMonitor()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="12":
+        resultado = restartPoint()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "0":
