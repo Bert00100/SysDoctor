@@ -474,6 +474,149 @@ def otmPing():
         debug_success("Otimização finalizada!")
         return "Otimização de Ping"
 
+def otmWifi():
+    header("Otimizador de Wifi")
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    print("[1] - OTIMIZAR")
+    print("[2] - REVERTER")
+    op = input("opcao: ")
+
+    if op == "1":
+        header("OTIMIZANDO WI-FI")
+        erros = []
+        debug_step(2, "Definindo o nível global de ajuste automático de janela TCP para normal")
+        autotuninglevel = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global autotuninglevel=normal"],
+            capture_output=True,
+            text=True
+        )
+        if autotuninglevel.stderr.strip():
+            debug_error("Erro ao executar a Definir o nível global de ajuste automático de janela TCP para normal")
+            erros.append("autotuninglevel")
+        else: 
+            debug_success("Definicao bem Sucedida!")
+
+        debug_step(3, "Ative o Receive Side Scaling (RSS) para permitir o balanceamento de carga de pacotes de rede entre múltiplos núcleos.")
+        rss = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global rss=enabled"],
+            capture_output=True,
+            text=True
+        )
+        if rss.stderr.strip():
+            debug_error("Erro ao executar a Definir o nível global de ajuste automático de janela TCP para normal")
+            erros.append("receiveSideScaling")
+        else: 
+            debug_success("Aticação bem Sucedida!")
+
+        debug_step(4, "Desative o offload TCP Chimney; processe todas as conexões TCP diretamente na CPU, e não na placa de rede")
+        offloadTCPChimney = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global chimney=disabled"],
+            capture_output=True,
+            text=True
+        )
+
+        if offloadTCPChimney.stderr.strip():
+            debug_error("Erro na Desativação do offload TCP Chimney; processe todas as conexões TCP diretamente na CPU, e não na placa de rede")
+            erros.append("offloadTCPChimney")
+        else:
+            debug_success("Desativação bem Sucedida")
+
+        debug_step(5, "Desativando os ajustes automáticos de heurística do TCP. Não modifique dinamicamente o comportamento do auto-tuning")
+        heuristics = subprocess.run(
+            ["powershell", "-Command", "netsh int tcp set heuristics disabled"],
+            capture_output=True,
+            text=True
+        )
+
+        if heuristics.stderr.strip():
+            debug_error("Erro na Desativação de ajustes automaticos de heuristicas")
+            erros.append("Heuristics")
+        else:
+            debug_success("Desativação bem Sucedida")
+        
+
+        if erros:
+             return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+        else:
+            debug_success("Otimização Finalizado")
+            return "Sistema Finalizado"
+    elif op == "2":
+        header("REVERTENDO WI-FI PARA PADRÃO")
+        erros = []
+        debug_step(2, "Revertendo o nível global de ajuste automático de janela TCP para padrão")
+        autotuninglevel = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global autotuninglevel=restricted"],
+            capture_output=True,
+            text=True
+        )
+        if autotuninglevel.stderr.split():
+            debug_error("Erro em reverter nível global de ajuste automático de janela TCP")
+            erros.append("autotuninglevel")
+        else:
+            debug_success("Revresão de nível global de ajuste automático de janela TCP bem sucedida!")
+        
+        debug_step(3, "Desativando Ative o Receive Side Scaling (RSS) para permitir o balanceamento de carga de pacotes de rede entre múltiplos núcleos.")
+        rss = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global rss=disabled"],
+            capture_output=True,
+            text=True
+        )
+
+        if rss.stderr.strip():
+            debug_error("Erro na desativação do Receive Side Scaling (RSS)")
+            erros.append("Receive Side Scaling (RSS)")
+        else:
+            debug_success("Desativação do Receive Side Scaling")
+
+        debug_step(4, "Ativação do Global Chimney")
+        globalChimney = subprocess.run(
+            ["powershell", "-Command", "netsh interface tcp set global chimney=enabled"],
+            capture_output=True,
+            text=True
+        )
+
+        if globalChimney.stderr.strip():
+            debug_error("Erro na ativação do Global Chimney")
+            erros.append("globalChimney")
+        else:
+            debug_success("Ativação do Global Chimney bem sucedida!")
+
+        debug_step(5, "Ativação da Heuristics")
+        heuristics = subprocess.run(
+            ["powershell", "-Command", "netsh int tcp set heuristics enabled"],
+            capture_output=True,
+            text=True
+        )
+        
+        if heuristics.stderr.strip():
+            debug_error("Erro na ativação da Heuristics")
+            erros.append("heuristics")
+        else:
+            debug_success("Ativação da heuristics bem sucedida!")
+
+
+        if erros:
+             return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+        else:
+            debug_success("Otimização Finalizado")
+            return "Sistema Finalizado"
+
+
+
+
 def mapNet():
     header("Mapa de conexão")
 
@@ -497,6 +640,7 @@ def mapNet():
     net = input("Digite o Servidor que deseja Mapear: ")
 
     debug_step(3, "Mapeando a rede...")
+    print("ATENÇÃO ISSO PODE LEVAR UM TEMPO")
     trackNet = subprocess.run(
         ["powershell", "-Command", f"tracert {net}"],
         capture_output=True,
@@ -585,11 +729,11 @@ def mostrar_menu():
     print("[5] - Limpar Cacches de Wifi/Eternet")
     print("[6] - Teste de Ping")
     print("[7] - Otimizar Ping")
-    #print("[8] - Otimizr Wifi")
+    print("[8] - Otimizr Wifi")
     print("[9] - Mapa de conexão")
     print("[10] - Verificar Temperatura")
     #print("[11] - Otimizar Windows")
-    print("[12] - Criar Ponsto de Restauração")
+    print("[12] - Criar Ponto de Restauração")
     #print("[13] - Configuração pós-instalação")
     
     print(" ")
@@ -625,6 +769,10 @@ while True:
         perguntar_continuar()
     elif op =="7":
         resultado = otmPing()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="8":
+        resultado = otmWifi()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op =="9":
