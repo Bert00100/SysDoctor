@@ -308,6 +308,30 @@ def limparSistema():
         debug_success("Limpeza completa finalizada!")
         return "Limpeza concluída com sucesso (Temp + RAM)"
 
+def speedtest():
+    import speedtest
+
+    header("Speed Test")
+    debug_step(1, "Executando SpeedTest...")
+
+    st = speedtest.Speedtest()
+    st.get_best_server()
+
+    # Calcula as velocidades em Megabits por segundo (Mbs)
+    download = st.download() / 1_000_000
+    upload = st.upload() / 1_000_000
+    ping = st.results.ping
+
+    # Exibe o resultado formatado no console
+    print("\n📡 Resultados do Teste de Velocidade:")
+    print("----------------------------------------")
+    print(f"📥 Download: {download:.2f} Mbs")
+    print(f"📤 Upload:   {upload:.2f} Mbs")
+    print(f"⚡ Ping:      {ping:.1f} ms")
+    print("----------------------------------------\n")
+
+
+
 def clearNet():
     """Otimiza e limpa configurações de rede"""
     header("LIMPEZA DE REDE")
@@ -465,6 +489,11 @@ def otmPing():
             text= True,
             check=False
         )
+        if starDNS.stderr.strip():
+            debug_error("Erro ao executar DNS JUMPER")
+            erros.append("Executar DNS JUMPER")
+        else:
+            debug_success("DNS Jumper Executado com sucesso!")
 
         debug_step(4, "Finalizando DNS Jumper")
 
@@ -614,9 +643,6 @@ def otmWifi():
             debug_success("Otimização Finalizado")
             return "Sistema Finalizado"
 
-
-
-
 def mapNet():
     header("Mapa de conexão")
 
@@ -654,25 +680,6 @@ def mapNet():
         print(trackNet.stdout)
         debug_success("Servidor Mapeado com sucesso")
 
-def restartPoint():
-    header("Criando Ponto de Restauração")
-
-    erros = []
-
-    debug_step(1, "Executando ferramente de ponto de Restauração")
-    point = subprocess.run(
-        ["SystemPropertiesProtection.exe"],
-        shell=True, 
-        capture_output= True, 
-        text= True
-    )
-
-    if point.stderr.strip():
-        erros.append("Execução de Ponto de Restauração")
-        debug_error("Erro ao executar ponto de restauração")
-    else:
-        debug_success("Ponto de Restauração Criado.")
-
 def temperatureMonitor():
     header("Monitor de Temperatura")
 
@@ -709,7 +716,12 @@ def temperatureMonitor():
             check=True
         )
 
-        debug_step(5, "Finalizando Sistema de Monitoramento")
+        if startHardMonitor.stderr.strip():
+            debug_error("Erro ao executar o HardwareMonitor")
+            erros.append("HardwareMonitor")
+        else:
+            debug_success("Execução do HardwareMonitor bem sucedida!")
+
         
     
     if erros:
@@ -717,6 +729,154 @@ def temperatureMonitor():
     else:
         debug_success("Sistema de monitoramento Finalizado")
         return "Sistema Finalizado"
+
+def restartPoint():
+    header("Criando Ponto de Restauração")
+
+    erros = []
+
+    debug_step(1, "Executando ferramente de ponto de Restauração")
+    point = subprocess.run(
+        ["SystemPropertiesProtection.exe"],
+        shell=True, 
+        capture_output= True, 
+        text= True
+    )
+
+    if point.stderr.strip():
+        erros.append("Execução de Ponto de Restauração")
+        debug_error("Erro ao executar ponto de restauração")
+    else:
+        debug_success("Ponto de Restauração Criado.")
+
+## Sessão do comando pos-instalacao ##
+
+def list_autInstall(pasta="Install"):
+        header("Listando Scrips")
+        path_Install = os.path.join("Scripts", pasta)
+
+        if not os.path.exists(path_Install):
+            os.makedirs(path_Install)
+        
+        return [f for f in os.listdir(path_Install) if f.endswith(".ps1")]
+
+def select_autInstall(autInstall):
+    header("Selecionano Script")
+    print("Selecione script que quer rodar:\n")
+    for i, scripts in enumerate(autInstall):
+        print(f"[{i}] {scripts.replace('.ps1', '').replace('-', ' ').title()}")
+    print()
+    while True:
+        try:
+            choice = int(input("Digite o númeoro do script: "))
+            if 0 <= choice < len(autInstall):
+                return autInstall[choice]
+            else:
+                print("Numero Invalide. Tente novamente.")
+        except ValueError:
+            print("Por favor, digite um número válido")
+
+def execut_autInstall(file):
+    header("Executando Script")
+    
+    # Constrói o caminho completo
+    path = os.path.join("Scripts", "Install", file)
+    
+    # CORREÇÃO: Adicione o número do passo
+    debug_step(1, f"Verificando arquivo: {path}")
+    
+    # Verifica se o arquivo existe
+    if not os.path.exists(path):
+        debug_error(f"Arquivo não encontrado: {path}")
+        return False
+    
+    debug_success(f"Arquivo encontrado: {file}")
+    
+    try:
+        # CORREÇÃO: Adicione o número do passo
+        debug_step(2, f"Executando script PowerShell...")
+        resultado = subprocess.run(
+            ["powershell", "-ExecutionPolicy", "Bypass", "-File", path],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        
+        # Se chegou aqui, o script executou com sucesso
+        if resultado.stdout:
+            print("Saída do script:")
+            print(resultado.stdout)
+        
+        debug_success("Script executado com sucesso!")
+        return True
+        
+    except subprocess.CalledProcessError as e:
+        debug_error(f"Erro na execução do script (código {e.returncode})")
+        if e.stderr:
+            debug_error(f"Erro: {e.stderr}")
+        if e.stdout:
+            print(f"Saída: {e.stdout}")
+        return False
+    
+
+def configPosInstall():
+    header("Scrips de Pos Instalacao")
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    debug_step(2, "Procurando Scripts de Pos Instalacao")
+
+    erros = []
+
+    debug_step(2, "Listando Scripts")
+    list_install = list_autInstall()  # Retorna a lista de scripts
+
+    if list_install:
+        debug_success("Listandao Scrips")
+    else:
+        debug_error("Erro ao achar a pasta Install ou Script")
+        erros.append("Encontrar ou criar a pasta Install")
+
+    debug_step(3, "Selecionar Script")
+    # CORREÇÃO: Passa a lista de scripts como argumento
+    select_install = select_autInstall(list_install)
+
+    if select_install:
+        debug_success("Script Selecionado com Sucesso")
+    else:
+        debug_error("Erro ao Selecionar Script")
+        erros.append("Encontrar Script")
+
+    debug_step(4, "Executando Script")
+    # CORREÇÃO: Passa o script selecionado como argumento
+    execut_install = execut_autInstall(select_install)
+
+    if execut_install:
+        debug_success("Script Executado com Sucesso")
+    else:
+        debug_error("Erro ao Executar Script")
+        erros.append("Executar Script")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        operacoes = [list_install, select_install, execut_install]
+        debug_success("Executando script")
+        return operacoes
+
+    
 
 def mostrar_menu():
     """Exibe o menu principal"""
@@ -726,15 +886,18 @@ def mostrar_menu():
     print("[2] - Limpar SSD/HD")
     print("[3] - Scanner do Windows")
     print("[4] - Limpar Memória RAM")
-    print("[5] - Limpar Cacches de Wifi/Eternet")
-    print("[6] - Teste de Ping")
-    print("[7] - Otimizar Ping")
-    print("[8] - Otimizr Wifi")
-    print("[9] - Mapa de conexão")
-    print("[10] - Verificar Temperatura")
-    #print("[11] - Otimizar Windows")
-    print("[12] - Criar Ponto de Restauração")
-    #print("[13] - Configuração pós-instalação")
+    print("[5] - SpeedTest")
+    print("[6] - Limpar Caches de Wifi/Eternet")
+    print("[7] - Teste de Ping")
+    print("[8] - Otimizar Ping")
+    print("[9] - Otimizr Wifi")
+    print("[10] - Mapa de conexão")
+    print("[11] - Verificar Temperatura")
+    #print("[12] - Otimizar Windows")
+    print("[13] - Criar Ponto de Restauração")
+    print("[14] - Configuração pós-instalação") #Melhorar
+
+
     
     print(" ")
     print("[0] - Fechar Terminal")
@@ -760,31 +923,39 @@ while True:
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "5":
+        resultado = speedtest()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op == "6":
         resultado = clearNet()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="6":
+    elif op =="7":
         resultado = testPing()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="7":
+    elif op =="8":
         resultado = otmPing()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="8":
+    elif op =="9":
         resultado = otmWifi()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="9":
+    elif op =="10":
         resultado = mapNet()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="10":
+    elif op =="11":
         resultado = temperatureMonitor()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
-    elif op =="12":
+    elif op =="13":
         resultado = restartPoint()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="14":
+        resultado = configPosInstall()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "0":
