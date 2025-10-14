@@ -329,9 +329,7 @@ def speedtest():
     print(f"📤 Upload:   {upload:.2f} Mbs")
     print(f"⚡ Ping:      {ping:.1f} ms")
     print("----------------------------------------\n")
-
-
-
+ 
 def clearNet():
     """Otimiza e limpa configurações de rede"""
     header("LIMPEZA DE REDE")
@@ -749,7 +747,7 @@ def restartPoint():
     else:
         debug_success("Ponto de Restauração Criado.")
 
-## Sessão do comando pos-instalacao ##
+# ========== Sessão do comando pos-instalacao ==========
 
 def list_autInstall(pasta="Install"):
         header("Listando Scrips")
@@ -876,7 +874,8 @@ def configPosInstall():
         debug_success("Executando script")
         return operacoes
 
-    
+# ========= Fim da sessão do comando pos-instalacao ==========
+
 
 def mostrar_menu():
     """Exibe o menu principal"""
