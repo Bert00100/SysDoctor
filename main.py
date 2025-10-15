@@ -878,29 +878,54 @@ def configPosInstall():
 
 
 def mostrar_menu():
-    """Exibe o menu principal"""
-    header("Reparo e Otimização de Windows")
-    print("Selecione a opção que você quer realizar\n")
-    print("[1] - Informação da Máquina")
-    print("[2] - Limpar SSD/HD")
-    print("[3] - Scanner do Windows")
-    print("[4] - Limpar Memória RAM")
-    print("[5] - SpeedTest")
-    print("[6] - Limpar Caches de Wifi/Eternet")
-    print("[7] - Teste de Ping")
-    print("[8] - Otimizar Ping")
-    print("[9] - Otimizr Wifi")
-    print("[10] - Mapa de conexão")
-    print("[11] - Verificar Temperatura")
-    #print("[12] - Otimizar Windows")
-    print("[13] - Criar Ponto de Restauração")
-    print("[14] - Configuração pós-instalação") #Melhorar
+    """Exibe o menu principal dividido em duas colunas com AA 'Doctor System'"""
 
+    def ascii_art_2():
+        art = r"""
+         ___    _  _    ___    ____     _____     ___    ____    _____    ____
+        / __)  ( \/ )  / __)  (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
+        \__ \   \  /   \__ \   )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
+        (___/   (__)   (___/  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
 
-    
-    print(" ")
-    print("[0] - Fechar Terminal")
+        """
+        print(art)
+        print(" " * 30 + "Windows Optimizer and Repair\n")
 
+    # Exibe o ASCII Art
+    ascii_art_2()
+
+    # Define as opções
+    opcoes_esq = [
+        "[ 1 ] Informação da Máquina",
+        "[ 3 ] Scanner do Windows",
+        "[ 5 ] SpeedTest",
+        "[ 7 ] Teste de Ping",
+        "[ 9 ] Otimizar Wifi",
+        "[ 11 ] Verificar Temperatura",
+        "[ 13 ] Criar Ponto de Restauração",
+    ]
+
+    opcoes_dir = [
+        "[ 2 ] Limpar SSD/HD",
+        "[ 4 ] Limpar Memória RAM",
+        "[ 6 ] Limpar Caches de Wifi/Ethernet",
+        "[ 8 ] Otimizar Ping",
+        "[ 10 ] Mapa de Conexão",
+        "[ 12 ] Otimizar Windows",
+        "[ 14 ] Configuração Pós-Instalação",
+    ]
+
+    largura_coluna = 45  # espaçamento entre colunas
+
+    print("Selecione a opção que você quer realizar:\n")
+
+    # Exibe o menu em duas colunas
+    for i in range(max(len(opcoes_esq), len(opcoes_dir))):
+        esq = opcoes_esq[i] if i < len(opcoes_esq) else ""
+        dir = opcoes_dir[i] if i < len(opcoes_dir) else ""
+        print(f"{esq:<{largura_coluna}}{dir}")
+
+    print("\n[ 0 ] Sair\n")
 # ========== LOOP PRINCIPAL ==========
 
 while True:
