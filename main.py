@@ -747,7 +747,7 @@ def restartPoint():
     else:
         debug_success("Ponto de Restauração Criado.")
 
-# ========== Sessão do comando pos-instalacao ==========
+# ========== Sessão do comando Pos-Instalacao ==========
 
 def list_autInstall(pasta="Install"):
         header("Listando Scrips")
@@ -816,7 +816,6 @@ def execut_autInstall(file):
             print(f"Saída: {e.stdout}")
         return False
     
-
 def configPosInstall():
     header("Scrips de Pos Instalacao")
 
@@ -874,6 +873,58 @@ def configPosInstall():
         debug_success("Executando script")
         return operacoes
 
+# ========== Sessão do comando Pos-Instalacao ==========
+
+def winDefender():
+    header("Scaneando com Windows")
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    debug_step(2, "Update Assinatura")
+    updateAssist = subprocess.run(
+        ["powershell", "-Command", "Update-MpSignature"],
+        capture_output=True,
+        text=True
+    )
+
+    if updateAssist.stderr.strip():
+        debug_error("Erro ao Atualizar os Pacotes")
+        erros.append("Atualização de Pacote")
+    else:
+        debug_success("Atualização de Pacotes Atualizados com Sucesso")
+
+    debug_step(3, "Scaner de Virus")
+    scanWin = subprocess.run(
+        ["powershell", "-Command", "Start-MpScan -ScanType Quick"],
+        capture_output=True,
+        text=True
+    )
+
+    if scanWin.stderr.strip():
+        debug_error("Erro ao Rodar a Verificação de Virus do Scaner")
+        erros.append("Scaner de Virus")
+    else:
+        debug_success("Scaner Bem Sucessedido")
+    
+    if erros:
+             return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Windows Defender Rodou com sucesso!")
+        return "Sistema Finalizado"
+
 # ========= Fim da sessão do comando pos-instalacao ==========
 
 
@@ -903,6 +954,7 @@ def mostrar_menu():
         "[ 9 ] Otimizar Wifi",
         "[ 11 ] Verificar Temperatura",
         "[ 13 ] Criar Ponto de Restauração",
+        #"[ 15 ] Adicao de tela de Login",
     ]
 
     opcoes_dir = [
@@ -911,8 +963,9 @@ def mostrar_menu():
         "[ 6 ] Limpar Caches de Wifi/Ethernet",
         "[ 8 ] Otimizar Ping",
         "[ 10 ] Mapa de Conexão",
-        "[ 12 ] Otimizar Windows",
+        #"[ 12 ] Otimizar Windows",
         "[ 14 ] Configuração Pós-Instalação",
+        "[ 16 ] Rodar Windows Defender",
     ]
 
     largura_coluna = 45  # espaçamento entre colunas
@@ -980,6 +1033,10 @@ while True:
         perguntar_continuar()
     elif op =="14":
         resultado = configPosInstall()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="16":
+        resultado = winDefender()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op == "0":
