@@ -56,16 +56,42 @@ def run_as_admin():
         return False
 
 def perguntar_continuar():
-    """Pergunta se deseja voltar ao menu ou sair"""
-    print("\n" + "="*50)
-    print(Fore.CYAN + "1 - Voltar ao Menu Principal" + Style.RESET_ALL)
-    print(Fore.CYAN + "0 - Sair" + Style.RESET_ALL)
-    opcao = input(Fore.YELLOW + "\nEscolha uma opção: " + Style.RESET_ALL)
-    
-    if opcao == "0":
-        print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
-        sys.exit(0)
+    """Pergunta se deseja voltar ao menu ou sair (para o menu principal)"""
+    while True:
+        print("\n" + "="*50)
+        print(Fore.CYAN + "1 - Voltar ao Menu Principal" + Style.RESET_ALL)
+        print(Fore.CYAN + "0 - Sair" + Style.RESET_ALL)
+        opcao = input(Fore.YELLOW + "\nEscolha uma opção: " + Style.RESET_ALL)
+
+        if opcao == "0":
+            print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
+            sys.exit(0)
+        elif opcao == "1":
+            return  # Volta para o menu principal
+        else:
+            print(Fore.RED + "Opção inválida! Tente novamente." + Style.RESET_ALL)
     # Se for "1" ou qualquer outra coisa, volta ao menu
+
+def perguntar_continuar_Win():
+    """Pergunta se deseja voltar ao menu ou sair"""
+    while True:
+        print("\n" + "="*50)
+        print(Fore.CYAN + "1 - Voltar ao Menu de Otimização" + Style.RESET_ALL)
+        print(Fore.CYAN + "2 - Voltar para o Menu Principal" + Style.RESET_ALL)
+        print(Fore.CYAN + "0 - Sair" + Style.RESET_ALL)
+        opcao = input(Fore.YELLOW + "\nEscolha uma opção: " + Style.RESET_ALL)
+
+        if opcao == "0":
+            print(Fore.CYAN + "Encerrando..." + Style.RESET_ALL)
+            sys.exit(0)
+        elif opcao == "1":
+            # Retorna ao menu de otimização do Windows
+            return "menu_otimizacao"
+        elif opcao == "2":
+            # Volta para o menu principal
+            return "menu_principal"
+        else:
+            print(Fore.RED + "Opção inválida! Tente novamente." + Style.RESET_ALL)
 
 # ========== FUNÇÕES PRINCIPAIS ==========
 
@@ -873,7 +899,7 @@ def configPosInstall():
         debug_success("Executando script")
         return operacoes
 
-# ========== Sessão do comando Pos-Instalacao ==========
+# ========== Fim da Sessão do comando Pos-Instalacao ==========
 
 def winDefender():
     header("Scaneando com Windows")
@@ -925,7 +951,152 @@ def winDefender():
         debug_success("Windows Defender Rodou com sucesso!")
         return "Sistema Finalizado"
 
-# ========= Fim da sessão do comando pos-instalacao ==========
+# ========== Sessão Otimização Do Windows ==========
+
+def menuOtmWin():
+    header("Otimizador do Windows")
+
+    opcoes_esq = [
+        "[ 1 ] Otimizar Energia",
+        "[ 3 ] Otimizar ALT+TAB",
+        #"[ 5 ] Desativar Serviços Inuteis",
+       # "[ 7 ] Desativar Overlays",
+        #"[ 9 ] Desativar Hibernação do Windows",
+        #"[ 11 ] Desativar Hyper-V",
+        #"[ 13 ] Desativar Donwload Maps Manager",
+    ]
+
+    opcoes_dir = [
+        #"[ 2 ] Desat. Efeitos Visuais",
+        #"[ 4 ] Desat. Tarefas e Serviços de Teçemetria",
+        #"[ 6 ] Debloater",
+        #"[ 8 ] Desat. UAC",
+        #"[ 10 ] Desativar Indexação de Arquivos",
+        #"[ 12 ] Desat. Aero Peek",
+        #"[ 14 ] Desativar SmartScreen",
+    ]
+
+    largura_coluna = 45  # espaçamento entre colunas
+
+    print("Selecione a opção que você quer realizar:\n")
+
+    # Exibe o menu em duas colunas
+    for i in range(max(len(opcoes_esq), len(opcoes_dir))):
+        esq = opcoes_esq[i] if i < len(opcoes_esq) else ""
+        dir = opcoes_dir[i] if i < len(opcoes_dir) else ""
+        print(f"{esq:<{largura_coluna}}{dir}")
+
+# ========== Funçoes==========
+
+def otmEnerg():
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+    
+    erros = []
+    header("Otimizando Energia")
+
+    debug_step(2, "Otimizando energia do PC...")
+    powercfg = subprocess.run(
+    [
+        "powershell",
+        "-Command",
+        (
+            "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; "
+            "powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR IdleDisable 0; "
+            "powercfg.exe /setactive SCHEME_CURRENT; "
+            "powercfg.cpl"
+        )
+    ],
+    capture_output=True,
+    text=True
+
+    )
+
+    if powercfg.stderr.strip():
+        debug_error("Erro ao aplicar CFG de otimização de energia")
+    else:
+        debug_success("Sucesso em aplicar CFG de otimização de energia")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Otimização Completa!")
+        return "Otimização de Energia Completa com sucesso"
+
+def otmlAltTab():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A limpeza de RAM requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem limpeza de RAM...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+    
+    while True:
+        erros = []
+    
+        header("ATENÇÂO ESSA OTIMIZAÇÂO E APENAS RECOMENDADA PARA PCs FRACOS")
+        print("[1] - Otimizar")
+        print("[2] - Reverter")
+        print(" ")
+        op = input("Escolha a opção: ")
+
+        if op == 1:
+            header("Otimizando ALT + TAB")
+            break
+        elif op == 2:
+            header("Revertendo Otimizasão do ALT + TAB")
+            break
+        else:
+            debug_error("Comando não aceito. Tente de novo")
+        
+
+
+# ========== Fim da Sessão Otimização Do Windows ==========
+
+def otmWin():
+    while True:
+        menuOtmWin()
+        op = input(Fore.YELLOW + "\nQual opção você deseja executar: " + Style.RESET_ALL)
+
+        if op == "1":
+            resultado = otmEnerg()
+            if resultado == "menu_principal":
+                break  
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "3":
+            resultado_scan = otmlAltTab()
+            print(Fore.GREEN + f"\n{resultado_scan}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "4":
+            resultado_limpeza = limparSistema()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+    
 
 
 def mostrar_menu():
@@ -955,6 +1126,8 @@ def mostrar_menu():
         "[ 11 ] Verificar Temperatura",
         "[ 13 ] Criar Ponto de Restauração",
         #"[ 15 ] Adicao de tela de Login",
+        #"[ 17 ] Atualizar Windows",
+        
     ]
 
     opcoes_dir = [
@@ -963,7 +1136,7 @@ def mostrar_menu():
         "[ 6 ] Limpar Caches de Wifi/Ethernet",
         "[ 8 ] Otimizar Ping",
         "[ 10 ] Mapa de Conexão",
-        #"[ 12 ] Otimizar Windows",
+        "[ 12 ] Otimizar Windows",
         "[ 14 ] Configuração Pós-Instalação",
         "[ 16 ] Rodar Windows Defender",
     ]
@@ -1025,6 +1198,10 @@ while True:
         perguntar_continuar()
     elif op =="11":
         resultado = temperatureMonitor()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="12":
+        resultado = otmWin()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op =="13":
