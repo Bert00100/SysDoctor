@@ -967,8 +967,8 @@ def menuOtmWin():
     ]
 
     opcoes_dir = [
-        #"[ 2 ] Desat. Efeitos Visuais",
-        #"[ 4 ] Desat. Tarefas e Serviços de Teçemetria",
+        "[ 2 ] Desat. Efeitos Visuais",
+        "[ 4 ] Desat. tarefas e serviços de Telemetria",
         #"[ 6 ] Debloater",
         #"[ 8 ] Desat. UAC",
         #"[ 10 ] Desativar Indexação de Arquivos",
@@ -986,7 +986,7 @@ def menuOtmWin():
         dir = opcoes_dir[i] if i < len(opcoes_dir) else ""
         print(f"{esq:<{largura_coluna}}{dir}")
 
-# ========== Funçoes==========
+# ========== Funçoes Otimização do Windows==========
 
 def otmEnerg():
 
@@ -1188,7 +1188,248 @@ def otmlAltTab():
     else:
         debug_success("Otimização completa!")
         return "Processo concluído com sucesso"
-      
+
+
+def desatEfeitoVisual():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação/ajuste de efeitos visuais requer privilégios elevados.")
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    # 2) VisualFXSetting no Explorer\VisualEffects (desempenho)
+    debug_step(2, "Mudando as configurações de efeitos visuais gerais para priorizar desempenho...")
+    efectVisual = subprocess.run(
+        [
+            "powershell",
+            "-Command",
+            r'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f'
+        ],
+        capture_output=True,
+        text=True
+    )
+    if efectVisual.returncode != 0:
+        debug_error(f"Erro ao aplicar VisualFXSetting (Explorer): {efectVisual.stderr.strip()}")
+        erros.append("VisualFXSetting (Explorer)")
+    else:
+        debug_success("Efeitos visuais (Explorer) ajustados para desempenho")
+
+    # 3) Transparência
+    debug_step(3, "Desativando transparência (janelas, barra de tarefas) para economizar GPU/CPU...")
+    desatTrans = subprocess.run(
+        [
+            "powershell",
+            "-Command",
+            r'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v EnableTransparency /t REG_DWORD /d 0 /f'
+        ],
+        capture_output=True,
+        text=True
+    )
+    if desatTrans.returncode != 0:
+        debug_error(f"Erro ao desativar transparência: {desatTrans.stderr.strip()}")
+        erros.append("EnableTransparency")
+    else:
+        debug_success("Transparência desativada com sucesso")
+
+    # 4) UserPreferencesMask (desativar várias animações/efeitos)
+    debug_step(4, "Aplicando máscara de preferências do usuário (desabilita várias animações/efeitos)...")
+    userPrefMask = subprocess.run(
+        [
+            "powershell",
+            "-Command",
+            r'reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9012038010000000 /f'
+        ],
+        capture_output=True,
+        text=True
+    )
+    if userPrefMask.returncode != 0:
+        debug_error(f"Erro ao definir UserPreferencesMask: {userPrefMask.stderr.strip()}")
+        erros.append("UserPreferencesMask")
+    else:
+        debug_success("UserPreferencesMask aplicada com sucesso")
+
+    # 5) VisualFXSetting no Desktop (reforça o ajuste de desempenho)
+    debug_step(5, "Forçando ajuste de efeitos visuais para desempenho (nível Desktop)...")
+    visualFxDesktop = subprocess.run(
+        [
+            "powershell",
+            "-Command",
+            r'reg add "HKCU\Control Panel\Desktop" /v VisualFXSetting /t REG_DWORD /d 2 /f'
+        ],
+        capture_output=True,
+        text=True
+    )
+    if visualFxDesktop.returncode != 0:
+        debug_error(f"Erro ao aplicar VisualFXSetting (Desktop): {visualFxDesktop.stderr.strip()}")
+        erros.append("VisualFXSetting (Desktop)")
+    else:
+        debug_success("Efeitos visuais (Desktop) ajustados para desempenho")
+
+    # (Opcional) Reiniciar Explorer para aplicar imediatamente:
+    debug_step(6, "Reiniciando Windows Explorer para aplicar as alterações...")
+    subprocess.run(["powershell", "-Command", "Get-Process explorer -ErrorAction SilentlyContinue | Stop-Process -Force"], capture_output=True, text=True)
+    subprocess.run(["powershell", "-Command", "Start-Sleep -Seconds 2"], capture_output=True, text=True)
+    subprocess.run(["powershell", "-Command", "Start-Process explorer.exe"], capture_output=True, text=True)
+    debug_success("Windows Explorer reiniciado")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Desativação/Ajuste de efeitos visuais concluído!")
+        return "Processo concluído com sucesso"
+
+def desatTelemetria():
+    header("Desativação da Telemetria e Coleta de Dados do Windows")
+    print(Fore.CYAN + "\nEsta função altera políticas do Windows para melhorar a privacidade, "
+          "desativando coleta de dados, anúncios e conexões automáticas com servidores da Microsoft.\n" + Style.RESET_ALL)
+    print(Fore.YELLOW + "⚠️  Essa otimização é recomendada apenas se você deseja priorizar privacidade e desempenho.\n" + Style.RESET_ALL)
+
+    header("ESCOLHA A OPÇÃO DE EXECUÇÃO")
+    print("[1] - Desativar Telemetria e Coleta de Dados")
+    print("[2] - Reverter (Restaurar configurações originais)")
+    print(" ")
+    op = input("Escolha a opção: ").strip()
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A modificação de políticas do sistema requer privilégios elevados.")
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    # ==========================================================
+    # OPÇÃO 1 - EXECUTAR DESATIVAÇÃO
+    # ==========================================================
+    if op == "1":
+        header("Desativando Telemetria e Coleta de Dados")
+
+        debug_step(2, "Desativando coleta de dados (AllowTelemetry)...")
+        cmd1 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f'
+        telemetria = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+        if telemetria.returncode != 0:
+            debug_error(f"Erro ao desativar Telemetria: {telemetria.stderr.strip()}")
+            erros.append("AllowTelemetry")
+        else:
+            debug_success("Telemetria desativada com sucesso")
+
+        debug_step(3, "Desativando coleta de dados de aplicativos (AllowAppDataCollection)...")
+        cmd2 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "AllowAppDataCollection" /t REG_DWORD /d 0 /f'
+        appData = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+        if appData.returncode != 0:
+            debug_error(f"Erro ao desativar coleta de dados de aplicativos: {appData.stderr.strip()}")
+            erros.append("AllowAppDataCollection")
+        else:
+            debug_success("Coleta de dados de aplicativos desativada com sucesso")
+
+        debug_step(4, "Bloqueando anúncios e personalização (DisableWindowsAdvertising)...")
+        cmd3 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisableWindowsAdvertising" /t REG_DWORD /d 1 /f'
+        ads = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+        if ads.returncode != 0:
+            debug_error(f"Erro ao desativar anúncios: {ads.stderr.strip()}")
+            erros.append("DisableWindowsAdvertising")
+        else:
+            debug_success("Publicidade e rastreamento desativados com sucesso")
+
+        debug_step(5, "Desativando experiências do consumidor (DisableMicrosoftConsumerExperience)...")
+        cmd4 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableMicrosoftConsumerExperience" /t REG_DWORD /d 1 /f'
+        consumerExp = subprocess.run(["powershell", "-Command", cmd4], capture_output=True, text=True)
+        if consumerExp.returncode != 0:
+            debug_error(f"Erro ao desativar experiência do consumidor: {consumerExp.stderr.strip()}")
+            erros.append("DisableMicrosoftConsumerExperience")
+        else:
+            debug_success("Experiências do consumidor desativadas com sucesso")
+
+        debug_step(6, "Impedindo conexão com servidores da Microsoft (DoNotConnectToWindowsUpdateInternetLocations)...")
+        cmd5 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "DoNotConnectToWindowsUpdateInternetLocations" /t REG_DWORD /d 1 /f'
+        winUpdate = subprocess.run(["powershell", "-Command", cmd5], capture_output=True, text=True)
+        if winUpdate.returncode != 0:
+            debug_error(f"Erro ao desativar conexão com Windows Update: {winUpdate.stderr.strip()}")
+            erros.append("DoNotConnectToWindowsUpdateInternetLocations")
+        else:
+            debug_success("Conexões automáticas com Windows Update desativadas com sucesso")
+
+    # ==========================================================
+    # OPÇÃO 2 - REVERTER CONFIGURAÇÕES
+    # ==========================================================
+    elif op == "2":
+        header("Revertendo Configurações de Telemetria")
+
+        debug_step(2, "Reativando coleta de dados (AllowTelemetry)...")
+        cmd1 = r'REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 3 /f'
+        telemetria = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+        if telemetria.returncode != 0:
+            debug_error(f"Erro ao reativar Telemetria: {telemetria.stderr.strip()}")
+            erros.append("AllowTelemetry")
+        else:
+            debug_success("Telemetria reativada com sucesso")
+
+        debug_step(3, "Reativando coleta de dados de aplicativos (AllowAppDataCollection)...")
+        cmd2 = r'REG DELETE "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "AllowAppDataCollection" /f'
+        appData = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+        if appData.returncode != 0:
+            debug_error(f"Erro ao reativar coleta de dados de aplicativos: {appData.stderr.strip()}")
+            erros.append("AllowAppDataCollection")
+        else:
+            debug_success("Coleta de dados de aplicativos reativada com sucesso")
+
+        debug_step(4, "Reativando anúncios e personalização (DisableWindowsAdvertising)...")
+        cmd3 = r'REG DELETE "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisableWindowsAdvertising" /f'
+        ads = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+        if ads.returncode != 0:
+            debug_error(f"Erro ao reativar anúncios: {ads.stderr.strip()}")
+            erros.append("DisableWindowsAdvertising")
+        else:
+            debug_success("Publicidade e personalização reativadas com sucesso")
+
+        debug_step(5, "Reativando experiências do consumidor (DisableMicrosoftConsumerExperience)...")
+        cmd4 = r'REG DELETE "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableMicrosoftConsumerExperience" /f'
+        consumerExp = subprocess.run(["powershell", "-Command", cmd4], capture_output=True, text=True)
+        if consumerExp.returncode != 0:
+            debug_error(f"Erro ao reativar experiência do consumidor: {consumerExp.stderr.strip()}")
+            erros.append("DisableMicrosoftConsumerExperience")
+        else:
+            debug_success("Experiências do consumidor reativadas com sucesso")
+
+        debug_step(6, "Reativando conexões com Windows Update (DoNotConnectToWindowsUpdateInternetLocations)...")
+        cmd5 = r'REG DELETE "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "DoNotConnectToWindowsUpdateInternetLocations" /f'
+        winUpdate = subprocess.run(["powershell", "-Command", cmd5], capture_output=True, text=True)
+        if winUpdate.returncode != 0:
+            debug_error(f"Erro ao reativar conexões do Windows Update: {winUpdate.stderr.strip()}")
+            erros.append("DoNotConnectToWindowsUpdateInternetLocations")
+        else:
+            debug_success("Conexões automáticas com Windows Update reativadas com sucesso")
+
+    else:
+        debug_error("Comando inválido. Digite 1 para desativar ou 2 para reverter.")
+        return "Ação cancelada pelo usuário."
+
+    if erros:
+        debug_error(f"Ocorreu um erro ao executar: {', '.join(erros)}")
+        return f"Falha parcial — comandos com erro: {', '.join(erros)}"
+    else:
+        if op == "1":
+            debug_success("Telemetria e coleta de dados desativadas com sucesso!")
+            return "Processo de desativação concluído com sucesso."
+        else:
+            debug_success("Configurações de telemetria restauradas para o padrão original!")
+            return "Processo de reversão concluído com sucesso."
 
 
 # ========== Fim da Sessão Otimização Do Windows ==========
@@ -1205,6 +1446,12 @@ def otmWin():
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
                 break
+        elif op == "2":
+            resultado_scan = desatEfeitoVisual()
+            print(Fore.GREEN + f"\n{resultado_scan}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
         elif op == "3":
             resultado_scan = otmlAltTab()
             print(Fore.GREEN + f"\n{resultado_scan}" + Style.RESET_ALL)
@@ -1212,7 +1459,7 @@ def otmWin():
             if resultado == "menu_principal":
                 break
         elif op == "4":
-            resultado_limpeza = limparSistema()
+            resultado_limpeza = desatTelemetria()
             print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
