@@ -867,7 +867,7 @@ def configPosInstall():
     list_install = list_autInstall()  # Retorna a lista de scripts
 
     if list_install:
-        debug_success("Listandao Scrips")
+        debug_success("Listanao Scrips")
     else:
         debug_error("Erro ao achar a pasta Install ou Script")
         erros.append("Encontrar ou criar a pasta Install")
@@ -1035,39 +1035,160 @@ def otmEnerg():
         debug_success("Otimização Completa!")
         return "Otimização de Energia Completa com sucesso"
 
+
 def otmlAltTab():
     debug_step(1, "Verificando privilégios de administrador...")
     if not is_admin():
         debug_error("Este script precisa ser executado como ADMINISTRADOR!")
-        debug_warning("A limpeza de RAM requer privilégios elevados.")
-        
+        debug_warning("A otimização do ALT+TAB requer privilégios elevados.")
         resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
         if resposta.lower() == 's':
             run_as_admin()
             return "Reiniciando como administrador..."
         else:
-            debug_warning("Continuando sem limpeza de RAM...")
+            debug_warning("Continuando sem privilégios elevados...")
     else:
         debug_success("Privilégios de administrador confirmados")
-    
+
     while True:
         erros = []
-    
-        header("ATENÇÂO ESSA OTIMIZAÇÂO E APENAS RECOMENDADA PARA PCs FRACOS")
+        header("ATENÇÃO: ESSA OTIMIZAÇÃO É RECOMENDADA APENAS PARA PCs FRACOS")
         print("[1] - Otimizar")
         print("[2] - Reverter")
         print(" ")
-        op = input("Escolha a opção: ")
+        op = input("Escolha a opção: ").strip()
 
-        if op == 1:
+        if op == "1":
             header("Otimizando ALT + TAB")
+            debug_step(2, "Alterando a configuração do Alt+Tab para o modo clássico")
+
+            alteracaoTab = subprocess.run(
+                [
+                    "powershell",
+                    "-Command",
+                    (
+                        "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer' "
+                        "-Name 'AltTabSettings' -Type DWord -Value 1"
+                    )
+                ],
+                capture_output=True,
+                text=True
+            )
+
+            if alteracaoTab.returncode != 0:
+                debug_error(f"Erro ao alterar o Alt+Tab: {alteracaoTab.stderr.strip()}")
+                erros.append("Alteração de AltTab")
+            else:
+                debug_success("Alteração aplicada com sucesso")
+
+            debug_step(3, "Encerrando Windows Explorer")
+            encerraExpl = subprocess.run(
+                [
+                    "powershell",
+                    "-Command",
+                    "Get-Process explorer -ErrorAction SilentlyContinue | Stop-Process -Force"
+                ],
+                capture_output=True,
+                text=True
+            )
+
+            if encerraExpl.returncode != 0:
+                debug_error("Erro ao encerrar o Windows Explorer")
+                erros.append("Encerrar o Windows Explorer")
+            else:
+                debug_success("Windows Explorer encerrado com sucesso")
+
+            subprocess.run(
+                ["powershell", "-Command", "Start-Sleep -Seconds 2"],
+                capture_output=True,
+                text=True
+            )
+
+            debug_step(4, "Reiniciando Windows Explorer")
+            reincExplo = subprocess.run(
+                ["powershell", "-Command", "Start-Process explorer.exe"],
+                capture_output=True,
+                text=True
+            )
+
+            if reincExplo.returncode != 0:
+                debug_error("Erro ao reiniciar o Windows Explorer")
+                erros.append("Reiniciar Windows Explorer")
+            else:
+                debug_success("Windows Explorer reiniciado com sucesso")
+
             break
-        elif op == 2:
-            header("Revertendo Otimizasão do ALT + TAB")
+
+        elif op == "2":
+            header("Revertendo otimização do ALT + TAB")
+            debug_step(2, "Removendo configuração e restaurando padrão")
+
+            revertAltTab = subprocess.run(
+                [
+                    "powershell",
+                    "-Command",
+                    (
+                        "Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer' "
+                        "-Name 'AltTabSettings' -ErrorAction SilentlyContinue"
+                    )
+                ],
+                capture_output=True,
+                text=True
+            )
+
+            if revertAltTab.returncode != 0:
+                debug_error(f"Erro ao reverter o Alt+Tab: {revertAltTab.stderr.strip()}")
+                erros.append("Reversão de AltTab")
+            else:
+                debug_success("Alt+Tab revertido para o modo moderno com sucesso")
+
+            debug_step(3, "Encerrando Windows Explorer")
+            encerraExpl = subprocess.run(
+                [
+                    "powershell",
+                    "-Command",
+                    "Get-Process explorer -ErrorAction SilentlyContinue | Stop-Process -Force"
+                ],
+                capture_output=True,
+                text=True
+            )
+
+            if encerraExpl.returncode != 0:
+                debug_error("Erro ao encerrar o Windows Explorer")
+                erros.append("Encerrar o Windows Explorer")
+            else:
+                debug_success("Windows Explorer encerrado com sucesso")
+
+            subprocess.run(
+                ["powershell", "-Command", "Start-Sleep -Seconds 2"],
+                capture_output=True,
+                text=True
+            )
+
+            debug_step(4, "Reiniciando Windows Explorer")
+            reincExplo = subprocess.run(
+                ["powershell", "-Command", "Start-Process explorer.exe"],
+                capture_output=True,
+                text=True
+            )
+
+            if reincExplo.returncode != 0:
+                debug_error("Erro ao reiniciar o Windows Explorer")
+                erros.append("Reiniciar Windows Explorer")
+            else:
+                debug_success("Windows Explorer reiniciado com sucesso")
+
             break
+
         else:
-            debug_error("Comando não aceito. Tente de novo")
-        
+            debug_error("Comando inválido. Digite 1 para otimizar ou 2 para reverter.")
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Otimização completa!")
+        return "Processo concluído com sucesso"
+      
 
 
 # ========== Fim da Sessão Otimização Do Windows ==========
