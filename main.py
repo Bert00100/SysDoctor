@@ -774,7 +774,6 @@ def restartPoint():
     else:
         debug_success("Ponto de Restauração Criado.")
 
-# ========== Sessão do comando Pos-Instalacao ==========
 
 def list_autInstall(pasta="Install"):
         header("Listando Scrips")
@@ -900,7 +899,6 @@ def configPosInstall():
         debug_success("Executando script")
         return operacoes
 
-# ========== Fim da Sessão do comando Pos-Instalacao ==========
 
 def winDefender():
     header("Scaneando com Windows")
@@ -2514,9 +2512,6 @@ def desatSmartScreen():
             debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
             continue
 
-
-# ========== Fim da Sessão Otimização Do Windows ==========
-
 def otmWin():
     while True:
         menuOtmWin()
@@ -2607,7 +2602,89 @@ def otmWin():
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
                 break
-    
+
+# ========== Fim da Sessão Otimização Do Windows ==========
+
+def winUpdate():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A busca e agendamento de atualizações requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Windows Update")
+        print("[1] - Buscar atualizações agora")
+        print("[2] - Agendar verificação de atualização")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - BUSCAR ATUALIZAÇÃO
+        # ==========================================================
+        if op == "1":
+            header("Procurando atualizações do Windows")
+
+            debug_step(2, "Executando comando 'usoclient StartScan'...")
+            scan = subprocess.run(["powershell", "-Command", "usoclient StartScan"], capture_output=True, text=True)
+            if scan.returncode != 0:
+                debug_error("Houve um erro ao procurar atualizações.")
+                erros.append("StartScan")
+            else:
+                debug_success("Verificação de atualizações iniciada com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Busca de atualizações iniciada com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - AGENDAR ATUALIZAÇÃO
+        # ==========================================================
+        elif op == "2":
+            header("Agendar verificação de atualização do Windows")
+
+            horario = input("Digite o horário para verificar atualizações (ex: 09:00): ").strip()
+
+            debug_step(2, f"Criando tarefa agendada para {horario}...")
+            cmd = (
+                f'schtasks /create /tn "WindowsUpdateCheck" '
+                f'/tr "powershell -Command usoclient StartScan" '
+                f'/sc once /st {horario} /f'
+            )
+            agendar = subprocess.run(["powershell", "-Command", cmd], capture_output=True, text=True)
+            if agendar.returncode != 0:
+                debug_error("Erro ao criar tarefa agendada para atualização.")
+                erros.append("Agendar Atualização")
+            else:
+                debug_success(f"Tarefa agendada com sucesso para {horario}.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"   
+            else:
+                debug_success("Otimização completa!")
+                return f"Atualização agendada para {horario} com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO INVÁLIDA
+        # ==========================================================
+        else:
+            debug_error("Opção inválida. Digite 1 para Buscar ou 2 para Agendar.")
+            continue
+
+
+
 
 
 def mostrar_menu():
@@ -2636,8 +2713,7 @@ def mostrar_menu():
         "[ 9 ] Otimizar Wifi",
         "[ 11 ] Verificar Temperatura",
         "[ 13 ] Criar Ponto de Restauração",
-        #"[ 15 ] Adicao de tela de Login",
-        #"[ 17 ] Atualizar Windows",
+        "[ 15 ] Atualizar Windows",
         
     ]
 
@@ -2721,6 +2797,10 @@ while True:
         perguntar_continuar()
     elif op =="14":
         resultado = configPosInstall()
+        print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
+        perguntar_continuar()
+    elif op =="15":
+        resultado = winUpdate()
         print(Fore.GREEN + f"\n{resultado}" + Style.RESET_ALL)
         perguntar_continuar()
     elif op =="16":
