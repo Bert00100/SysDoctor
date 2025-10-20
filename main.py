@@ -1741,7 +1741,7 @@ def overlays():
     debug_step(1, "Verificando privilégios de administrador...")
     if not is_admin():
         debug_error("Este script precisa ser executado como ADMINISTRADOR!")
-        debug_warning("A remoção de apps requer privilégios elevados.")
+        debug_warning("A modificação de registro requer privilégios elevados.")
         
         resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
         if resposta.lower() == 's':
@@ -1751,15 +1751,132 @@ def overlays():
             debug_warning("Continuando sem privilégios elevados...")
     else:
         debug_success("Privilégios de administrador confirmados")
-    
+
     erros = []
 
+    header("Otimizar ou Reverter Overlays")
+    print("[1] - Desativar Overlays (Game Bar e Game Mode)")
+    print("[2] - Reverter Overlays ao Padrão")
+    print(" ")
+    op = input("Escolha uma opção: ").strip()
 
-    if erros:
-                    return f"Ocorreu um erro ao executar: {', '.join(erros)}"
-                else:
-                    debug_success("Otimização completa!")
-                    return "Processo concluído com sucesso"
+    # ==========================================================
+    # OPÇÃO 1 - DESATIVAR OVERLAYS
+    # ==========================================================
+    if op == "1":
+        header("Desativando Overlays (Game Bar e Game Mode)")
+
+        debug_step(2, "Desativando AllowAutoGameMode...")
+        cmd1 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f'
+        reg1 = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+        if reg1.stderr.strip():
+            debug_error("Erro ao desativar AllowAutoGameMode")
+            erros.append("AllowAutoGameMode")
+        else:
+            debug_success("AllowAutoGameMode desativado com sucesso")
+
+        debug_step(3, "Desativando AutoGameModeEnabled...")
+        cmd2 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d 0 /f'
+        reg2 = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+        if reg2.stderr.strip():
+            debug_error("Erro ao desativar AutoGameModeEnabled")
+            erros.append("AutoGameModeEnabled")
+        else:
+            debug_success("AutoGameModeEnabled desativado com sucesso")
+
+        debug_step(4, "Desativando ShowStartupPanel...")
+        cmd3 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "ShowStartupPanel" /t REG_DWORD /d 0 /f'
+        reg3 = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+        if reg3.stderr.strip():
+            debug_error("Erro ao desativar ShowStartupPanel")
+            erros.append("ShowStartupPanel")
+        else:
+            debug_success("ShowStartupPanel desativado com sucesso")
+
+        # Adição moderna para desempenho — desativar Game DVR e Xbox Game Bar
+        debug_step(5, "Desativando GameDVR e Xbox Game Bar globalmente...")
+        cmd4 = r'reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 0 /f'
+        reg4 = subprocess.run(["powershell", "-Command", cmd4], capture_output=True, text=True)
+        if reg4.stderr.strip():
+            debug_error("Erro ao desativar GameDVR_Enabled")
+            erros.append("GameDVR_Enabled")
+        else:
+            debug_success("GameDVR_Enabled desativado com sucesso")
+
+        cmd5 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "GamePanelStartupTipIndex" /t REG_DWORD /d 0 /f'
+        reg5 = subprocess.run(["powershell", "-Command", cmd5], capture_output=True, text=True)
+        if reg5.stderr.strip():
+            debug_error("Erro ao desativar GamePanelStartupTipIndex")
+            erros.append("GamePanelStartupTipIndex")
+        else:
+            debug_success("Xbox Game Bar desativado com sucesso")
+
+        if erros:
+            return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+        else:
+            debug_success("Otimização completa!")
+            return "Processo concluído com sucesso"
+
+    # ==========================================================
+    # OPÇÃO 2 - REVERTER OVERLAYS
+    # ==========================================================
+    elif op == "2":
+        header("Revertendo Overlays ao padrão")
+
+        debug_step(2, "Reativando AllowAutoGameMode...")
+        cmd1 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 1 /f'
+        reg1 = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+        if reg1.stderr.strip():
+            debug_error("Erro ao reativar AllowAutoGameMode")
+            erros.append("AllowAutoGameMode")
+        else:
+            debug_success("AllowAutoGameMode reativado com sucesso")
+
+        debug_step(3, "Reativando AutoGameModeEnabled...")
+        cmd2 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d 1 /f'
+        reg2 = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+        if reg2.stderr.strip():
+            debug_error("Erro ao reativar AutoGameModeEnabled")
+            erros.append("AutoGameModeEnabled")
+        else:
+            debug_success("AutoGameModeEnabled reativado com sucesso")
+
+        debug_step(4, "Reativando ShowStartupPanel...")
+        cmd3 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "ShowStartupPanel" /t REG_DWORD /d 1 /f'
+        reg3 = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+        if reg3.stderr.strip():
+            debug_error("Erro ao reativar ShowStartupPanel")
+            erros.append("ShowStartupPanel")
+        else:
+            debug_success("ShowStartupPanel reativado com sucesso")
+
+        # Reverter GameDVR e Xbox Game Bar
+        debug_step(5, "Reativando GameDVR e Xbox Game Bar...")
+        cmd4 = r'reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d 1 /f'
+        reg4 = subprocess.run(["powershell", "-Command", cmd4], capture_output=True, text=True)
+        if reg4.stderr.strip():
+            debug_error("Erro ao reativar GameDVR_Enabled")
+            erros.append("GameDVR_Enabled")
+        else:
+            debug_success("GameDVR_Enabled reativado com sucesso")
+
+        cmd5 = r'reg add "HKCU\Software\Microsoft\GameBar" /v "GamePanelStartupTipIndex" /t REG_DWORD /d 1 /f'
+        reg5 = subprocess.run(["powershell", "-Command", cmd5], capture_output=True, text=True)
+        if reg5.stderr.strip():
+            debug_error("Erro ao reativar GamePanelStartupTipIndex")
+            erros.append("GamePanelStartupTipIndex")
+        else:
+            debug_success("Xbox Game Bar reativado com sucesso")
+
+        if erros:
+            return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+        else:
+            debug_success("Otimização completa!")
+            return "Processo concluído com sucesso"
+
+    else:
+        debug_error("Comando inválido. Digite 1 para desativar ou 2 para reverter.")
+        return "Ação cancelada pelo usuário."
 
 
 # ========== Fim da Sessão Otimização Do Windows ==========
@@ -1802,6 +1919,12 @@ def otmWin():
                 break
         elif op == "6":
             resultado_limpeza = debloater()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "7":
+            resultado_limpeza = overlays()
             print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
