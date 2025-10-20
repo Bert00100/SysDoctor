@@ -963,8 +963,8 @@ def menuOtmWin():
         "[ 5 ] Desative Serviços Inúteis",
         "[ 7 ] Desativar Overlays",
         "[ 9 ] Desat. Hibernação",
-        #"[ 11 ] Desativar Hyper-V",
-        #"[ 13 ] Desativar Donwload Maps Manager",
+        "[ 11 ] Desativar Hyper-V",
+        "[ 13 ] Desativar Donwload Maps Manager",
     ]
 
     opcoes_dir = [
@@ -972,9 +972,9 @@ def menuOtmWin():
         "[ 4 ] Desat. tarefas e serviços de Telemetria",
         "[ 6 ] Debloater",
         "[ 8 ] Desat. UAC",
-        #"[ 10 ] Desativar Indexação de Arquivos",
-        #"[ 12 ] Desat. Aero Peek",
-        #"[ 14 ] Desativar SmartScreen",
+        "[ 10 ] Desativar Indexação de Arquivos",
+        "[ 12 ] Desat. Aero Peek",
+        "[ 14 ] Desativar SmartScreen",
     ]
 
     largura_coluna = 45  # espaçamento entre colunas
@@ -1035,7 +1035,6 @@ def otmEnerg():
     else:
         debug_success("Otimização Completa!")
         return "Otimização de Energia Completa com sucesso"
-
 
 def otmlAltTab():
     debug_step(1, "Verificando privilégios de administrador...")
@@ -1189,7 +1188,6 @@ def otmlAltTab():
     else:
         debug_success("Otimização completa!")
         return "Processo concluído com sucesso"
-
 
 def desatEfeitoVisual():
     debug_step(1, "Verificando privilégios de administrador...")
@@ -1432,7 +1430,6 @@ def desatTelemetria():
             debug_success("Configurações de telemetria restauradas para o padrão original!")
             return "Processo de reversão concluído com sucesso."
 
-
 def servicesInutes():
     header("Otimização de Serviços do Windows")
     print(Fore.CYAN + "\nEsta função desativa ou restaura serviços do Windows "
@@ -1568,7 +1565,6 @@ def servicesInutes():
         else:
             debug_success("Serviços restaurados para o padrão original!")
             return "Reversão concluída com sucesso."
-
 
 def debloater():
     debug_step(1, "Verificando privilégios de administrador...")
@@ -1878,7 +1874,6 @@ def overlays():
         debug_error("Comando inválido. Digite 1 para desativar ou 2 para reverter.")
         return "Ação cancelada pelo usuário."
 
-
 def desatUAC():
     debug_step(1, "Verificando privilégios de administrador...")
     if not is_admin():
@@ -1997,6 +1992,528 @@ def desatHibernacao():
             debug_error("Opção inválida! Digite 1 para Desativar ou 2 para Ativar.")
             continue
 
+def desatHyperV():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do Hyper-V requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Desativação do Hyper-V")
+        print("[1] - Desativar Hyper-V")
+        print("[2] - Ativar Hyper-V")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR HYPER-V
+        # ==========================================================
+        if op == "1":
+            header("Desativando Hyper-V e recursos de virtualização")
+
+            debug_step(2, "Executando desativação do recurso Hyper-V...")
+            cmd1 = 'Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart'
+            desat_hyperv = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+            if desat_hyperv.returncode != 0:
+                debug_error("Houve um erro ao desativar o Hyper-V.")
+                erros.append("Desativar Hyper-V")
+            else:
+                debug_success("Hyper-V desativado com sucesso.")
+
+            debug_step(3, "Desativando Virtual Machine Platform...")
+            cmd2 = 'Disable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart'
+            vmp = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+            if vmp.returncode != 0:
+                debug_error("Houve um erro ao desativar o Virtual Machine Platform.")
+                erros.append("VirtualMachinePlatform")
+            else:
+                debug_success("Virtual Machine Platform desativada com sucesso.")
+
+            debug_step(4, "Desativando Windows Hypervisor Platform...")
+            cmd3 = 'Disable-WindowsOptionalFeature -Online -FeatureName HypervisorPlatform -NoRestart'
+            whp = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+            if whp.returncode != 0:
+                debug_error("Houve um erro ao desativar o Hypervisor Platform.")
+                erros.append("HypervisorPlatform")
+            else:
+                debug_success("Windows Hypervisor Platform desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Hyper-V e recursos de virtualização desativados com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR HYPER-V
+        # ==========================================================
+        elif op == "2":
+            header("Ativando Hyper-V e recursos associados")
+
+            debug_step(2, "Reativando Hyper-V...")
+            cmd1 = 'Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart'
+            enable_hyperv = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+            if enable_hyperv.returncode != 0:
+                debug_error("Houve um erro ao ativar o Hyper-V.")
+                erros.append("Ativar Hyper-V")
+            else:
+                debug_success("Hyper-V ativado com sucesso.")
+
+            debug_step(3, "Reativando Virtual Machine Platform...")
+            cmd2 = 'Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart'
+            enable_vmp = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+            if enable_vmp.returncode != 0:
+                debug_error("Houve um erro ao ativar o Virtual Machine Platform.")
+                erros.append("VirtualMachinePlatform")
+            else:
+                debug_success("Virtual Machine Platform ativada com sucesso.")
+
+            debug_step(4, "Reativando Windows Hypervisor Platform...")
+            cmd3 = 'Enable-WindowsOptionalFeature -Online -FeatureName HypervisorPlatform -NoRestart'
+            enable_whp = subprocess.run(["powershell", "-Command", cmd3], capture_output=True, text=True)
+            if enable_whp.returncode != 0:
+                debug_error("Houve um erro ao ativar o Hypervisor Platform.")
+                erros.append("HypervisorPlatform")
+            else:
+                debug_success("Windows Hypervisor Platform ativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Hyper-V e recursos de virtualização ativados com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+def desatDownloadMaps():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do Download Maps Manager requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Gerenciamento do Serviço Download Maps Manager")
+        print("[1] - Desativar serviço (MapsBroker)")
+        print("[2] - Ativar serviço (padrão)")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR SERVIÇO
+        # ==========================================================
+        if op == "1":
+            header("Desativando serviço Download Maps Manager")
+
+            debug_step(2, "Parando o serviço MapsBroker...")
+            stop_cmd = "sc stop MapsBroker"
+            stop_proc = subprocess.run(["powershell", "-Command", stop_cmd], capture_output=True, text=True)
+            if stop_proc.returncode != 0:
+                debug_warning("Serviço MapsBroker já pode estar parado.")
+            else:
+                debug_success("Serviço MapsBroker parado com sucesso.")
+
+            debug_step(3, "Configurando inicialização do serviço como desativado...")
+            config_cmd = "sc config MapsBroker start= disabled"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao desativar o serviço MapsBroker.")
+                erros.append("MapsBroker")
+            else:
+                debug_success("Serviço Download Maps Manager desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Download Maps Manager desativado com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR SERVIÇO
+        # ==========================================================
+        elif op == "2":
+            header("Ativando serviço Download Maps Manager")
+
+            debug_step(2, "Reconfigurando inicialização do serviço para automática...")
+            config_cmd = "sc config MapsBroker start= auto"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao configurar o serviço MapsBroker.")
+                erros.append("MapsBroker")
+            else:
+                debug_success("Serviço configurado para inicialização automática.")
+
+            debug_step(3, "Iniciando serviço MapsBroker...")
+            start_cmd = "sc start MapsBroker"
+            start_proc = subprocess.run(["powershell", "-Command", start_cmd], capture_output=True, text=True)
+            if start_proc.returncode != 0:
+                debug_warning("O serviço não pôde ser iniciado (pode já estar ativo ou não disponível).")
+            else:
+                debug_success("Serviço MapsBroker iniciado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Download Maps Manager reativado com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do Download Maps Manager requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Gerenciamento do Serviço Download Maps Manager")
+        print("[1] - Desativar serviço (MapsBroker)")
+        print("[2] - Ativar serviço (padrão)")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR SERVIÇO
+        # ==========================================================
+        if op == "1":
+            header("Desativando serviço Download Maps Manager")
+
+            debug_step(2, "Parando o serviço MapsBroker...")
+            stop_cmd = "sc stop MapsBroker"
+            stop_proc = subprocess.run(["powershell", "-Command", stop_cmd], capture_output=True, text=True)
+            if stop_proc.returncode != 0:
+                debug_warning("Serviço MapsBroker já pode estar parado.")
+            else:
+                debug_success("Serviço MapsBroker parado com sucesso.")
+
+            debug_step(3, "Configurando inicialização do serviço como desativado...")
+            config_cmd = "sc config MapsBroker start= disabled"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao desativar o serviço MapsBroker.")
+                erros.append("MapsBroker")
+            else:
+                debug_success("Serviço Download Maps Manager desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Download Maps Manager desativado com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR SERVIÇO
+        # ==========================================================
+        elif op == "2":
+            header("Ativando serviço Download Maps Manager")
+
+            debug_step(2, "Reconfigurando inicialização do serviço para automática...")
+            config_cmd = "sc config MapsBroker start= auto"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao configurar o serviço MapsBroker.")
+                erros.append("MapsBroker")
+            else:
+                debug_success("Serviço configurado para inicialização automática.")
+
+            debug_step(3, "Iniciando serviço MapsBroker...")
+            start_cmd = "sc start MapsBroker"
+            start_proc = subprocess.run(["powershell", "-Command", start_cmd], capture_output=True, text=True)
+            if start_proc.returncode != 0:
+                debug_warning("O serviço não pôde ser iniciado (pode já estar ativo ou não disponível).")
+            else:
+                debug_success("Serviço MapsBroker iniciado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Download Maps Manager reativado com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+def desatIndexacao():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A modificação da indexação requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Indexação de Arquivos do Windows")
+        print("[1] - Desativar serviço de indexação")
+        print("[2] - Ativar serviço de indexação (padrão)")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR
+        # ==========================================================
+        if op == "1":
+            header("Desativando Indexação de Arquivos")
+
+            debug_step(2, "Parando o serviço Windows Search...")
+            stop_cmd = "sc stop WSearch"
+            stop_proc = subprocess.run(["powershell", "-Command", stop_cmd], capture_output=True, text=True)
+            if stop_proc.returncode != 0:
+                debug_warning("Serviço WSearch já pode estar parado.")
+            else:
+                debug_success("Serviço Windows Search parado com sucesso.")
+
+            debug_step(3, "Desativando inicialização do serviço...")
+            config_cmd = "sc config WSearch start= disabled"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao desativar o serviço Windows Search.")
+                erros.append("WSearch")
+            else:
+                debug_success("Serviço Windows Search desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Serviço de indexação desativado com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR
+        # ==========================================================
+        elif op == "2":
+            header("Reativando Indexação de Arquivos")
+
+            debug_step(2, "Configurando serviço Windows Search como automático...")
+            config_cmd = "sc config WSearch start= auto"
+            config_proc = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if config_proc.returncode != 0:
+                debug_error("Erro ao reconfigurar o serviço Windows Search.")
+                erros.append("WSearch")
+            else:
+                debug_success("Serviço configurado para inicialização automática.")
+
+            debug_step(3, "Iniciando o serviço Windows Search...")
+            start_cmd = "sc start WSearch"
+            start_proc = subprocess.run(["powershell", "-Command", start_cmd], capture_output=True, text=True)
+            if start_proc.returncode != 0:
+                debug_warning("Serviço Windows Search não pôde ser iniciado.")
+            else:
+                debug_success("Serviço Windows Search iniciado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Serviço de indexação reativado com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+def desatAeroPeek():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do Aero Peek requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Configuração do Aero Peek")
+        print("[1] - Desativar Aero Peek")
+        print("[2] - Ativar Aero Peek (padrão)")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR
+        # ==========================================================
+        if op == "1":
+            header("Desativando Aero Peek")
+
+            debug_step(2, "Modificando chave de registro EnableAeroPeek...")
+            cmd = r'reg add "HKCU\Software\Microsoft\Windows\DWM" /v EnableAeroPeek /t REG_DWORD /d 0 /f'
+            aero_off = subprocess.run(["powershell", "-Command", cmd], capture_output=True, text=True)
+            if aero_off.stderr.strip():
+                debug_error("Erro ao desativar o Aero Peek.")
+                erros.append("Aero Peek")
+            else:
+                debug_success("Aero Peek desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Aero Peek desativado com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR
+        # ==========================================================
+        elif op == "2":
+            header("Ativando Aero Peek")
+
+            debug_step(2, "Restaurando chave EnableAeroPeek...")
+            cmd = r'reg add "HKCU\Software\Microsoft\Windows\DWM" /v EnableAeroPeek /t REG_DWORD /d 1 /f'
+            aero_on = subprocess.run(["powershell", "-Command", cmd], capture_output=True, text=True)
+            if aero_on.stderr.strip():
+                debug_error("Erro ao reativar o Aero Peek.")
+                erros.append("Aero Peek")
+            else:
+                debug_success("Aero Peek ativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Aero Peek ativado com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+
+def desatSmartScreen():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do SmartScreen requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Configuração do Windows SmartScreen")
+        print("[1] - Desativar SmartScreen")
+        print("[2] - Ativar SmartScreen (padrão)")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR
+        # ==========================================================
+        if op == "1":
+            header("Desativando SmartScreen")
+
+            debug_step(2, "Desativando via registro (Explorer)...")
+            cmd1 = r'reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v SmartScreenEnabled /t REG_SZ /d Off /f'
+            sm1 = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+            if sm1.stderr.strip():
+                debug_error("Erro ao desativar SmartScreen (Explorer).")
+                erros.append("SmartScreen Explorer")
+            else:
+                debug_success("SmartScreen (Explorer) desativado com sucesso.")
+
+            debug_step(3, "Desativando via políticas (SystemApps)...")
+            cmd2 = r'reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v EnableSmartScreen /t REG_DWORD /d 0 /f'
+            sm2 = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+            if sm2.stderr.strip():
+                debug_error("Erro ao desativar SmartScreen (System).")
+                erros.append("SmartScreen System")
+            else:
+                debug_success("SmartScreen (System) desativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "SmartScreen desativado com sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR
+        # ==========================================================
+        elif op == "2":
+            header("Ativando SmartScreen")
+
+            debug_step(2, "Reativando via registro (Explorer)...")
+            cmd1 = r'reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v SmartScreenEnabled /t REG_SZ /d RequireAdmin /f'
+            sm1 = subprocess.run(["powershell", "-Command", cmd1], capture_output=True, text=True)
+            if sm1.stderr.strip():
+                debug_error("Erro ao ativar SmartScreen (Explorer).")
+                erros.append("SmartScreen Explorer")
+            else:
+                debug_success("SmartScreen (Explorer) ativado com sucesso.")
+
+            debug_step(3, "Reativando via políticas (SystemApps)...")
+            cmd2 = r'reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v EnableSmartScreen /t REG_DWORD /d 1 /f'
+            sm2 = subprocess.run(["powershell", "-Command", cmd2], capture_output=True, text=True)
+            if sm2.stderr.strip():
+                debug_error("Erro ao ativar SmartScreen (System).")
+                erros.append("SmartScreen System")
+            else:
+                debug_success("SmartScreen (System) ativado com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "SmartScreen ativado com sucesso!"
+
+        else:
+            debug_error("Opção inválida. Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
 
 # ========== Fim da Sessão Otimização Do Windows ==========
 
@@ -2056,6 +2573,36 @@ def otmWin():
                 break
         elif op == "9":
             resultado_limpeza = desatHibernacao()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "10":
+            resultado_limpeza = desatIndexacao()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "11":
+            resultado_limpeza = desatHyperV()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "12":
+            resultado_limpeza =desatAeroPeek()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "13":
+            resultado_limpeza = desatDownloadMaps()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "14":
+            resultado_limpeza = desatSmartScreen()
             print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
