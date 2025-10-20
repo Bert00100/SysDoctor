@@ -962,7 +962,7 @@ def menuOtmWin():
         "[ 3 ] Otimizar ALT+TAB",
         "[ 5 ] Desative Serviços Inúteis",
         "[ 7 ] Desativar Overlays",
-        #"[ 9 ] Desativar Hibernação do Windows",
+        "[ 9 ] Desat. Hibernação",
         #"[ 11 ] Desativar Hyper-V",
         #"[ 13 ] Desativar Donwload Maps Manager",
     ]
@@ -971,7 +971,7 @@ def menuOtmWin():
         "[ 2 ] Desat. Efeitos Visuais",
         "[ 4 ] Desat. tarefas e serviços de Telemetria",
         "[ 6 ] Debloater",
-        #"[ 8 ] Desat. UAC",
+        "[ 8 ] Desat. UAC",
         #"[ 10 ] Desativar Indexação de Arquivos",
         #"[ 12 ] Desat. Aero Peek",
         #"[ 14 ] Desativar SmartScreen",
@@ -1879,6 +1879,125 @@ def overlays():
         return "Ação cancelada pelo usuário."
 
 
+def desatUAC():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A desativação do UAC requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    header("Desativação do Controle de Conta de Usuário (UAC)")
+
+    debug_step(2, "Executando verificação de integridade do sistema (sfc /scannow)...")
+    sfc_scan = subprocess.run(["powershell", "-Command", "sfc /scannow"], capture_output=True, text=True)
+    if sfc_scan.returncode != 0 or "erro" in sfc_scan.stderr.lower():
+        debug_error("Falha ao executar o verificador de arquivos do sistema (SFC).")
+        erros.append("sfc /scannow")
+    else:
+        debug_success("Verificação de integridade concluída com sucesso.")
+
+    debug_step(3, "Desativando o UAC (User Account Control)...")
+    cmd = r'reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f'
+    disable_uac = subprocess.run(["powershell", "-Command", cmd], capture_output=True, text=True)
+    if disable_uac.stderr.strip():
+        debug_error("Erro ao desativar o UAC.")
+        erros.append("EnableLUA")
+    else:
+        debug_success("UAC desativado com sucesso.")
+
+    debug_step(4, "Finalizando processo e limpando tela...")
+    subprocess.run(["powershell", "-Command", "cls"], capture_output=True, text=True)
+
+    if erros:
+        return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+    else:
+        debug_success("Otimização completa!")
+        return "Processo concluído com sucesso"
+
+def desatHibernacao():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A modificação da hibernação requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    erros = []
+
+    while True:
+        header("Hibernação do Windows")
+        print("[1] - Desativar")
+        print("[2] - Ativar")
+        print(" ")
+        op = input("Escolha sua opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - DESATIVAR HIBERNAÇÃO
+        # ==========================================================
+        if op == "1":
+            header("Desativando Hibernação")
+
+            debug_step(2, "Executando comando powercfg /hibernate off...")
+            destvHiber = subprocess.run(["powercfg", "/hibernate", "off"], capture_output=True, text=True)
+
+            if destvHiber.returncode != 0:
+                debug_error("Houve um erro ao desativar a hibernação.")
+                erros.append("Desativar Hibernação")
+            else:
+                debug_success("Hibernação desativada com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Hibernação Desativada com Sucesso!"
+
+        # ==========================================================
+        # OPÇÃO 2 - ATIVAR HIBERNAÇÃO
+        # ==========================================================
+        elif op == "2":
+            header("Ativando Hibernação")
+
+            debug_step(2, "Executando comando powercfg /hibernate on...")
+            ativHiber = subprocess.run(["powercfg", "/hibernate", "on"], capture_output=True, text=True)
+
+            if ativHiber.returncode != 0:
+                debug_error("Houve um erro ao ativar a hibernação.")
+                erros.append("Ativar Hibernação")
+            else:
+                debug_success("Hibernação ativada com sucesso.")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"   
+            else:
+                debug_success("Otimização completa!")
+                return "Hibernação Ativada com Sucesso!"
+
+        # ==========================================================
+        # OPÇÃO INVÁLIDA
+        # ==========================================================
+        else:
+            debug_error("Opção inválida! Digite 1 para Desativar ou 2 para Ativar.")
+            continue
+
+
 # ========== Fim da Sessão Otimização Do Windows ==========
 
 def otmWin():
@@ -1929,6 +2048,18 @@ def otmWin():
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
                 break
+        elif op == "8":
+            resultado_limpeza = desatUAC()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "9":
+            resultado_limpeza = desatHibernacao()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
     
 
 
@@ -1937,10 +2068,10 @@ def mostrar_menu():
 
     def ascii_art_2():
         art = r"""
-         ___    _  _    ___    ____     _____     ___    ____    _____    ____
-        / __)  ( \/ )  / __)  (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
-        \__ \   \  /   \__ \   )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
-        (___/   (__)   (___/  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
+         ___    _  _    ___         ____     _____     ___    ____    _____    ____
+        / __)  ( \/ )  / __)       (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
+        \__ \   \  /   \__ \        )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
+        (___/   (__)   (___/  ___  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
 
         """
         print(art)
