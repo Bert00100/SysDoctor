@@ -6,6 +6,7 @@ import psutil
 import socket
 import ctypes
 import sys
+import shutil
 from colorama import Fore, Style, init
 
 # Inicializa suporte a cores no terminal
@@ -959,7 +960,7 @@ def menuOtmWin():
     opcoes_esq = [
         "[ 1 ] Otimizar Energia",
         "[ 3 ] Otimizar ALT+TAB",
-        #"[ 5 ] Desativar Serviços Inuteis",
+        "[ 5 ] Desative Serviços Inúteis",
        # "[ 7 ] Desativar Overlays",
         #"[ 9 ] Desativar Hibernação do Windows",
         #"[ 11 ] Desativar Hyper-V",
@@ -969,7 +970,7 @@ def menuOtmWin():
     opcoes_dir = [
         "[ 2 ] Desat. Efeitos Visuais",
         "[ 4 ] Desat. tarefas e serviços de Telemetria",
-        #"[ 6 ] Debloater",
+        "[ 6 ] Debloater",
         #"[ 8 ] Desat. UAC",
         #"[ 10 ] Desativar Indexação de Arquivos",
         #"[ 12 ] Desat. Aero Peek",
@@ -1432,6 +1433,144 @@ def desatTelemetria():
             return "Processo de reversão concluído com sucesso."
 
 
+def servicesInutes():
+    header("Otimização de Serviços do Windows")
+    print(Fore.CYAN + "\nEsta função desativa ou restaura serviços do Windows "
+          "para melhorar o desempenho e reduzir consumo de recursos.\n" + Style.RESET_ALL)
+    print(Fore.YELLOW + "⚠️  Use com cautela: alguns serviços desativados podem afetar recursos "
+          "como impressão, diagnósticos ou atualizações.\n" + Style.RESET_ALL)
+
+    header("ESCOLHA A OPÇÃO DE EXECUÇÃO")
+    print("[1] - Desativar Serviços")
+    print("[2] - Reverter Otimização")
+    print(" ")
+    op = input("Escolha a opção: ").strip()
+
+    # ==========================================================
+    # VERIFICAÇÃO DE ADMINISTRADOR
+    # ==========================================================
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A modificação de serviços requer privilégios elevados.")
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+
+    # ==========================================================
+    # VALIDAÇÃO DO UTILITÁRIO SC.EXE
+    # ==========================================================
+    debug_step(2, "Verificando utilitário do Windows (sc.exe)...")
+    if shutil.which("sc.exe") is None:
+        debug_error("O utilitário 'sc.exe' não foi encontrado no sistema!")
+        debug_warning("Verifique se o Windows está instalado corretamente ou se há restrições de PATH.")
+        return "Execução cancelada — dependência ausente."
+    else:
+        debug_success("Utilitário 'sc.exe' encontrado e disponível.")
+
+    erros = []
+
+    # ==========================================================
+    # OPÇÃO 1 - DESATIVAR SERVIÇOS
+    # ==========================================================
+    if op == "1":
+        header("Desativando Serviços Desnecessários")
+
+        servicos = {
+            "Spooler": "disabled",
+            "wisvc": "disabled",
+            "WerSvc": "disabled",
+            "WbioSrvc": "disabled",
+            "DiagTrack": "disabled",
+            "dmwappushservice": "disabled",
+            "wuauserv": "disabled",
+            "dosvc": "disabled"
+        }
+
+        step = 3
+        for nome, modo in servicos.items():
+            debug_step(step, f"Parando serviço {nome}...")
+            stop_cmd = f'sc.exe stop {nome}'
+            resultado_stop = subprocess.run(["powershell", "-Command", stop_cmd], capture_output=True, text=True)
+            if resultado_stop.returncode != 0:
+                debug_warning(f"Serviço {nome} pode já estar parado ou indisponível.")
+            else:
+                debug_success(f"Serviço {nome} parado com sucesso")
+
+            debug_step(step + 1, f"Configurando serviço {nome} para {modo}...")
+            config_cmd = f'sc.exe config {nome} start= {modo}'
+            resultado_cfg = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if resultado_cfg.returncode != 0:
+                debug_error(f"Erro ao configurar {nome}: {resultado_cfg.stderr.strip()}")
+                erros.append(nome)
+            else:
+                debug_success(f"{nome} configurado para {modo} com sucesso")
+            step += 2
+
+    # ==========================================================
+    # OPÇÃO 2 - REVERTER SERVIÇOS
+    # ==========================================================
+    elif op == "2":
+        header("Revertendo Configurações de Serviços")
+
+        servicos = {
+            "Spooler": "auto",
+            "wisvc": "demand",
+            "WerSvc": "demand",
+            "WbioSrvc": "demand",
+            "DiagTrack": "demand",
+            "dmwappushservice": "demand",
+            "wuauserv": "auto",
+            "dosvc": "demand"
+        }
+
+        step = 3
+        for nome, modo in servicos.items():
+            debug_step(step, f"Reconfigurando serviço {nome} para {modo}...")
+            config_cmd = f'sc.exe config {nome} start= {modo}'
+            resultado_cfg = subprocess.run(["powershell", "-Command", config_cmd], capture_output=True, text=True)
+            if resultado_cfg.returncode != 0:
+                debug_error(f"Erro ao reconfigurar {nome}: {resultado_cfg.stderr.strip()}")
+                erros.append(nome)
+                step += 2
+                continue
+            else:
+                debug_success(f"Serviço {nome} configurado para {modo} com sucesso")
+
+            debug_step(step + 1, f"Iniciando serviço {nome}...")
+            start_cmd = f'sc.exe start {nome}'
+            resultado_start = subprocess.run(["powershell", "-Command", start_cmd], capture_output=True, text=True)
+            if resultado_start.returncode != 0:
+                debug_warning(f"Serviço {nome} não pôde ser iniciado (pode estar desnecessário ou já desativado).")
+            else:
+                debug_success(f"Serviço {nome} iniciado com sucesso")
+            step += 2
+
+    else:
+        debug_error("Comando inválido. Digite 1 para desativar ou 2 para reverter.")
+        return "Ação cancelada pelo usuário."
+
+    # ==========================================================
+    # FINALIZAÇÃO
+    # ==========================================================
+    if erros:
+        debug_error(f"Ocorreu um erro ao processar os seguintes serviços: {', '.join(erros)}")
+        return f"Falha parcial — serviços com erro: {', '.join(erros)}"
+    else:
+        if op == "1":
+            debug_success("Todos os serviços desativados com sucesso!")
+            return "Otimização concluída com sucesso."
+        else:
+            debug_success("Serviços restaurados para o padrão original!")
+            return "Reversão concluída com sucesso."
+
+
+
 # ========== Fim da Sessão Otimização Do Windows ==========
 
 def otmWin():
@@ -1460,6 +1599,12 @@ def otmWin():
                 break
         elif op == "4":
             resultado_limpeza = desatTelemetria()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "5":
+            resultado_limpeza = servicesInutes()
             print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
