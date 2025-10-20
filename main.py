@@ -961,7 +961,7 @@ def menuOtmWin():
         "[ 1 ] Otimizar Energia",
         "[ 3 ] Otimizar ALT+TAB",
         "[ 5 ] Desative Serviços Inúteis",
-       # "[ 7 ] Desativar Overlays",
+        "[ 7 ] Desativar Overlays",
         #"[ 9 ] Desativar Hibernação do Windows",
         #"[ 11 ] Desativar Hyper-V",
         #"[ 13 ] Desativar Donwload Maps Manager",
@@ -1570,6 +1570,197 @@ def servicesInutes():
             return "Reversão concluída com sucesso."
 
 
+def debloater():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A remoção de apps requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+    
+    erros = []
+
+    while True:
+        header("Debloater")
+        print("[1] - Remover apps padrão e desativar Copilot, OfficeHub e outros recursos.")
+        print("[2] - Reinstalar apps padrão do Windows")
+        print(" ")
+        op = input("Escolha uma opção: ").strip()
+
+        # ==========================================================
+        # OPÇÃO 1 - REMOVER APPS PADRÃO E COPILOT
+        # ==========================================================
+        if op == "1":
+            header("Removendo Aplicativos e Ajustando Sistema")
+
+            debug_step(2, "Removendo Microsoft Cortana...")
+            cortana = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.Windows.Cortana* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if cortana.stderr.strip():
+                debug_error("Erro em desistalar o Microsoft Cortana")
+                erros.append("Microsoft Cortana")
+            else:
+                debug_success("Microsoft Cortana Desinstalado com Sucesso")
+
+            debug_step(3, "Removendo Microsoft OfficeHub...")
+            officehub = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.MicrosoftOfficeHub* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if officehub.stderr.strip():
+                debug_error("Erro em desistalar o OfficeHub")
+                erros.append("OfficeHub")
+            else:
+                debug_success("OfficeHub Desinstalado com Sucesso")
+
+            debug_step(4, "Removendo Phone Link (Seu Telefone)...")
+            phone = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.YourPhone* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if phone.stderr.strip():
+                debug_error("Erro em desistalar o Phone Link")
+                erros.append("Phone Link")
+            else:
+                debug_success("Phone Link Desinstalado com Sucesso")
+
+            debug_step(5, "Removendo App de Mensagens...")
+            messaging = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.Messaging* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if messaging.stderr.strip():
+                debug_error("Erro em desistalar o App de Mensagens")
+                erros.append("Mensagens")
+            else:
+                debug_success("App de Mensagens Desinstalado com Sucesso")
+
+            debug_step(6, "Removendo Mapas...")
+            maps = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.WindowsMaps* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if maps.stderr.strip():
+                debug_error("Erro em desistalar o Mapas")
+                erros.append("Mapas")
+            else:
+                debug_success("Mapas Desinstalado com Sucesso")
+
+            debug_step(7, "Removendo Groove Music...")
+            groove = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.ZuneMusic* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if groove.stderr.strip():
+                debug_error("Erro em desistalar o Groove Music")
+                erros.append("Groove Music")
+            else:
+                debug_success("Groove Music Desinstalado com Sucesso")
+
+            debug_step(8, "Removendo Get Started...")
+            getstarted = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if getstarted.stderr.strip():
+                debug_error("Erro em desistalar o Get Started")
+                erros.append("Get Started")
+            else:
+                debug_success("Get Started Desinstalado com Sucesso")
+
+            debug_step(9, "Removendo Mail e Calendar...")
+            calendar = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *microsoft.windowscommunicationsapps* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if calendar.stderr.strip():
+                debug_error("Erro em desistalar o Mail e Calendar")
+                erros.append("Mail e Calendar")
+            else:
+                debug_success("Mail e Calendar Desinstalados com Sucesso")
+
+            debug_step(10, "Removendo Alarmes...")
+            alarms = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.WindowsAlarms* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if alarms.stderr.strip():
+                debug_error("Erro em desistalar o Alarmes")
+                erros.append("Alarmes")
+            else:
+                debug_success("Alarmes Desinstalado com Sucesso")
+
+            debug_step(11, "Removendo 3D Builder...")
+            builder = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.3DBuilder* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if builder.stderr.strip():
+                debug_error("Erro em desistalar o 3D Builder")
+                erros.append("3D Builder")
+            else:
+                debug_success("3D Builder Desinstalado com Sucesso")
+
+            debug_step(12, "Removendo App de Notícias (Bing News)...")
+            news = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.BingNews* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if news.stderr.strip():
+                debug_error("Erro em desistalar o Bing News")
+                erros.append("Bing News")
+            else:
+                debug_success("Bing News Desinstalado com Sucesso")
+
+            debug_step(13, "Removendo OneDrive AppX...")
+            onedrive = subprocess.run(["powershell", "-Command", 'Get-AppxPackage *Microsoft.OneDriveSync* | Remove-AppxPackage -ErrorAction SilentlyContinue'], capture_output=True, text=True)
+            if onedrive.stderr.strip():
+                debug_error("Erro em desistalar o OneDrive")
+                erros.append("OneDrive")
+            else:
+                debug_success("OneDrive Desinstalado com Sucesso")
+
+            # Ajustes de interface (sem retorno individual)
+            debug_step(14, "Aplicando ajustes de interface e políticas...")
+            subprocess.run(["powershell", "-Command", r'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowCopilotButton /t REG_DWORD /d 0 /f'], capture_output=True, text=True)
+            subprocess.run(["powershell", "-Command", r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Copilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f'], capture_output=True, text=True)
+            subprocess.run(["powershell", "-Command", r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v HideCopilotButton /f'], capture_output=True, text=True)
+            subprocess.run(["powershell", "-Command", r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f'], capture_output=True, text=True)
+            subprocess.run(["powershell", "-Command", r'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f'], capture_output=True, text=True)
+            
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Processo concluído com sucesso"
+
+        # ==========================================================
+        # OPÇÃO 2 - REINSTALAR APPS PADRÃO
+        # ==========================================================
+        elif op == "2":
+            header("Reinstalando Aplicativos Padrão")
+
+            debug_step(2, "Reinstalando pacotes removidos do sistema...")
+            restore = subprocess.run(["powershell", "-Command",
+                                      "Get-AppxPackage -AllUsers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "
+                                      "$($_.InstallLocation + '\\AppXManifest.xml')} -ErrorAction SilentlyContinue"],
+                                     capture_output=True, text=True)
+            if restore.stderr.strip():
+                debug_error("Erro ao reinstalar aplicativos padrão")
+                erros.append("Reinstalação geral")
+            else:
+                debug_success("Aplicativos padrão reinstalados com sucesso")
+
+            if erros:
+                return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+            else:
+                debug_success("Otimização completa!")
+                return "Processo concluído com sucesso"
+
+        else:
+            debug_error("Comando inválido. Digite 1 para remover ou 2 para reinstalar.")
+            break
+
+def overlays():
+    debug_step(1, "Verificando privilégios de administrador...")
+    if not is_admin():
+        debug_error("Este script precisa ser executado como ADMINISTRADOR!")
+        debug_warning("A remoção de apps requer privilégios elevados.")
+        
+        resposta = input(Fore.YELLOW + "\nDeseja reiniciar como administrador? (s/n): " + Style.RESET_ALL)
+        if resposta.lower() == 's':
+            run_as_admin()
+            return "Reiniciando como administrador..."
+        else:
+            debug_warning("Continuando sem privilégios elevados...")
+    else:
+        debug_success("Privilégios de administrador confirmados")
+    
+    erros = []
+
+
+    if erros:
+                    return f"Ocorreu um erro ao executar: {', '.join(erros)}"
+                else:
+                    debug_success("Otimização completa!")
+                    return "Processo concluído com sucesso"
+
 
 # ========== Fim da Sessão Otimização Do Windows ==========
 
@@ -1605,6 +1796,12 @@ def otmWin():
                 break
         elif op == "5":
             resultado_limpeza = servicesInutes()
+            print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
+            resultado = perguntar_continuar_Win()
+            if resultado == "menu_principal":
+                break
+        elif op == "6":
+            resultado_limpeza = debloater()
             print(Fore.GREEN + f"\n{resultado_limpeza}" + Style.RESET_ALL)
             resultado = perguntar_continuar_Win()
             if resultado == "menu_principal":
