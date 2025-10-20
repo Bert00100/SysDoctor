@@ -210,14 +210,14 @@ Todas as funções críticas possuem **modo reversão**, permitindo restaurar co
 
 ## 📦 Licença
 
-Uso **livre para fins pessoais e educacionais**.  
+Uso **Exclusivo Para Code Suporte and Hub**.  
 Distribuição comercial requer autorização do autor.
 
 ---
 
 ## 🧑‍💻 Autor
 
-**Felipe Beroncini**  
+**Felipe B. Franceschini**  
 🧠 Desenvolvedor Python & Otimizador de Sistemas  
 💬 “Feito para manter o Windows leve, limpo e rápido — do jeito certo.”
 
