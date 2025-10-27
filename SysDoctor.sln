@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysDoctor", "SysDoctor.csproj", "{B1ED0120-8F5C-39CD-9A3D-CBC903AA81CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1ED0120-8F5C-39CD-9A3D-CBC903AA81CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1ED0120-8F5C-39CD-9A3D-CBC903AA81CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1ED0120-8F5C-39CD-9A3D-CBC903AA81CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1ED0120-8F5C-39CD-9A3D-CBC903AA81CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5FB7D07-17D7-45AA-A6C5-2E4EE24820E7}
+	EndGlobalSection
+EndGlobal
