@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Management.Automation;
+using Spectre.Console;
 using SysDoctor.Scripts;
 
 namespace SysDoctor
