@@ -1,6 +1,0 @@
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.csproj.AssemblyReference.cache
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.AssemblyInfoInputs.cache
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.AssemblyInfo.cs
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.csproj.CoreCompileInputs.cache
-C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\obj\Debug\net6.0\SysDoctor.sourcelink.json

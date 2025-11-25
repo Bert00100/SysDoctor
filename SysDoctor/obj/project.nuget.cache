@@ -1,17 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YOdmj0QESeE=",
+  "dgSpecHash": "41TvwhAdKKQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.net.illink.analyzers\\7.0.100-1.23211.1\\microsoft.net.illink.analyzers.7.0.100-1.23211.1.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.net.illink.tasks\\7.0.100-1.23211.1\\microsoft.net.illink.tasks.7.0.100-1.23211.1.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.20\\microsoft.netcore.app.ref.7.0.20.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.20\\microsoft.windowsdesktop.app.ref.7.0.20.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.20\\microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\7.0.20\\microsoft.netcore.app.host.win-x64.7.0.20.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }
