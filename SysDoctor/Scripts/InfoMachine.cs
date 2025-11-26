@@ -2,8 +2,11 @@ using System;
 
 namespace SysDoctor.Scripts
 {
-    class Infomachine
+    class InfoMachine
     {
-        
+        public static void Executar()
+        {
+            System.Console.WriteLine("Informação da maquina");
+        }
     }
 }
