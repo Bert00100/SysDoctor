@@ -1,9 +1,18 @@
-﻿namespace SysDoctor
+﻿using System.Security.Principal;
+
+namespace SysDoctor
 {
     class Program
     {
         public static void Main(string[] args)
         {
+            // Verifica se está rodando como administrador
+            if (!IsRunningAsAdministrator())
+            {
+                RestartAsAdministrator();
+                return;
+            }
+
             bool continuar = true;
 
             while (continuar)
@@ -23,7 +32,7 @@
                         InfoMachine.Executar();
                         break;
                     case 2:
-                        // Limpar SSD/HD
+                        ClearDisk.Executar();
                         break;
                     case 3:
                         // Scanner do Windows
@@ -83,6 +92,45 @@
                     Console.ReadKey();
                     Console.Clear();
                 }
+            }
+        }
+
+        private static bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void RestartAsAdministrator()
+        {
+            try
+            {
+                AnsiConsole.MarkupLine("[yellow]⚠️  O programa precisa de privilégios de Administrador![/]");
+                AnsiConsole.MarkupLine("[cyan]Reiniciando como Administrador...[/]");
+                
+                ProcessStartInfo processInfo = new ProcessStartInfo
+                {
+                    FileName = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location,
+                    UseShellExecute = true,
+                    Verb = "runas" // Solicita elevação de privilégios
+                };
+
+                Process.Start(processInfo);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]❌ Erro ao tentar reiniciar como Administrador: {ex.Message}[/]");
+                AnsiConsole.MarkupLine("[yellow]Por favor, execute o programa manualmente como Administrador.[/]");
+                AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
+                Console.ReadKey();
             }
         }
 
