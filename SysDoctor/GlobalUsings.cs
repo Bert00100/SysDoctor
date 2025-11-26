@@ -1,0 +1,10 @@
+global using System;
+global using System.Diagnostics;
+global using System.Management;
+global using System.Management.Automation;
+global using Spectre.Console;
+global using CommandLine;
+global using SysDoctor.Scripts;
+global using System.Net.NetworkInformation;
+global using System.Net;
+global using System.Linq;

@@ -1,26 +1,18 @@
-﻿using System;
-using System.Diagnostics;
-using System.Management.Automation;
-using Spectre.Console;
-using CommandLine;
-using SysDoctor.Scripts;
-
-namespace SysDoctor
+﻿namespace SysDoctor
 {
     class Program
     {
         public static void Main(string[] args)
         {
-            AnsiConsole.MarkupLine("[green]SysDoctor CSharp 1.0[/]");
-            AnsiConsole.WriteLine();
-
             bool continuar = true;
 
             while (continuar)
             {
-                AnsiConsole.MarkupLine("[yellow]Menu Principal:[/]");
-                AnsiConsole.WriteLine("1 - Informações da Máquina");
-                AnsiConsole.WriteLine("0 - Sair");
+                // Exibe o ASCII Art
+                MostrarAsciiArt();
+
+                // Exibe o menu dividido em duas colunas
+                MostrarMenu();
 
                 AnsiConsole.Markup("[cyan] Digite sua opção: [/]");
                 int.TryParse(Console.ReadLine(), out int opcao);
@@ -29,6 +21,51 @@ namespace SysDoctor
                 {
                     case 1:
                         InfoMachine.Executar();
+                        break;
+                    case 2:
+                        // Limpar SSD/HD
+                        break;
+                    case 3:
+                        // Scanner do Windows
+                        break;
+                    case 4:
+                        // Limpar Memória RAM
+                        break;
+                    case 5:
+                        // SpeedTest
+                        break;
+                    case 6:
+                        // Limpar Caches de Wifi/Ethernet
+                        break;
+                    case 7:
+                        // Teste de Ping
+                        break;
+                    case 8:
+                        // Otimizar Ping
+                        break;
+                    case 9:
+                        // Otimizar Wifi
+                        break;
+                    case 10:
+                        // Mapa de Conexão
+                        break;
+                    case 11:
+                        // Verificar Temperatura
+                        break;
+                    case 12:
+                        // Otimizar Windows
+                        break;
+                    case 13:
+                        // Criar Ponto de Restauração
+                        break;
+                    case 14:
+                        // Configuração Pós-Instalação
+                        break;
+                    case 15:
+                        // Atualizar Windows
+                        break;
+                    case 16:
+                        // Rodar Windows Defender
                         break;
                     case 0:
                         AnsiConsole.MarkupLine("[red]Encerrando...[/]");
@@ -47,6 +84,67 @@ namespace SysDoctor
                     Console.Clear();
                 }
             }
+        }
+
+        private static void MostrarAsciiArt()
+        {
+            string asciiArt = @"
+         ___    _  _    ___         ____     _____     ___    ____    _____    ____
+        / __)  ( \/ )  / __)       (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
+        \__ \   \  /   \__ \        )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
+        (___/   (__)   (___/  ___  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
+            ";
+
+            AnsiConsole.MarkupLine("[blue]" + asciiArt + "[/]");
+            AnsiConsole.MarkupLine("[yellow]" + " ".PadLeft(30) + "Reparador e Otimizador de Windows[/]");
+            AnsiConsole.WriteLine();
+        }
+
+        private static void MostrarMenu()
+        {
+            var opcoesEsq = new[]
+            {
+                "[[ 1 ]] Informação da Máquina",
+                // "[[ 3 ]] Scanner do Windows", 
+                // "[[ 5 ]] SpeedTest",
+                // "[[ 7 ]] Teste de Ping",
+                // "[[ 9 ]] Otimizar Wifi",
+                // "[[ 11 ]] Verificar Temperatura",
+                // "[[ 13 ]] Criar Ponto de Restauração",
+                // "[[ 15 ]] Atualizar Windows"
+            };
+
+            var opcoesDir = new[]
+            {
+                "[[ 2 ]] Limpar SSD/HD",
+                // "[[ 4 ]] Limpar Memória RAM",
+                // "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
+                // "[[ 8 ]] Otimizar Ping",
+                // "[[ 10 ]] Mapa de Conexão",
+                // "[[ 12 ]] Otimizar Windows",
+                // "[[ 14 ]] Configuração Pós-Instalação",
+                // "[[ 16 ]] Rodar Windows Defender"
+            };
+
+            // Coluna esquerda
+            var colunaEsq = new Panel(string.Join("\n", opcoesEsq))
+                .Header(" Opções")
+                .Border(BoxBorder.Rounded)
+                .Padding(1, 1);
+            
+            // Coluna direita  
+            var colunaDir = new Panel(string.Join("\n", opcoesDir))
+                .Header(" Opções")
+                .Border(BoxBorder.Rounded)
+                .Padding(1, 1);
+
+            // Cria duas colunas para o menu
+            var columns = new Columns(new Panel[] { colunaEsq, colunaDir });
+            
+            AnsiConsole.Write(columns);
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("[dim][[ 0 ]] Sair[/]");
+            AnsiConsole.WriteLine();
         }
     }
 }
