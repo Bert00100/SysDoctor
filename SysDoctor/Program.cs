@@ -48,7 +48,8 @@ namespace SysDoctor
                         ScanWindow.Executar();
                         break;
                     case 4:
-                        // Limpar Memória RAM
+                        Console.Clear();
+                        ClearRAM.Executar();
                         break;
                     case 5:
                         // SpeedTest
@@ -179,24 +180,26 @@ namespace SysDoctor
             {
                 "[[ 1 ]] Informação da Máquina",
                 "[[ 3 ]] Scanner do Windows", 
-                "[[ 5 ]] SpeedTest",
-                "[[ 7 ]] Teste de Ping",
-                "[[ 9 ]] Otimizar Wifi",
-                "[[ 11 ]] Verificar Temperatura",
-                "[[ 13 ]] Criar Ponto de Restauração",
-                "[[ 15 ]] Atualizar Windows"
+                // "[[ 5 ]] SpeedTest",
+                // "[[ 7 ]] Teste de Ping",
+                // "[[ 9 ]] Otimizar Wifi",
+                // "[[ 11 ]] Verificar Temperatura",
+                // "[[ 13 ]] Criar Ponto de Restauração",
+                // "[[ 15 ]] Atualizar Windows"
+                // "[[ 17 ]] Pack de programas"
             };
 
             var opcoesDir = new[]
             {
                 "[[ 2 ]] Limpar SSD/HD",
                 "[[ 4 ]] Limpar Memória RAM",
-                "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
-                "[[ 8 ]] Otimizar Ping",
-                "[[ 10 ]] Mapa de Conexão",
-                "[[ 12 ]] Otimizar Windows",
-                "[[ 14 ]] Configuração Pós-Instalação",
-                "[[ 16 ]] Rodar Windows Defender"
+                // "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
+                // "[[ 8 ]] Otimizar Ping",
+                // "[[ 10 ]] Mapa de Conexão",
+                // "[[ 12 ]] Otimizar Windows",
+                // "[[ 14 ]] Configuração Pós-Instalação",
+                // "[[ 16 ]] Rodar Windows Defender"
+                // "[[ 17 ]] ISO Windows 11 Pro otm"
             };
 
             // Cria uma tabela para melhor organização
