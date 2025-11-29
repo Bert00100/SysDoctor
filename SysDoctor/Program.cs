@@ -53,6 +53,8 @@ namespace SysDoctor
                         break;
                     case 5:
                         // SpeedTest
+                        Console.Clear();
+                        SpeedTest.Executar();
                         break;
                     case 6:
                         // Limpar Caches de Wifi/Ethernet
@@ -180,7 +182,7 @@ namespace SysDoctor
             {
                 "[[ 1 ]] Informação da Máquina",
                 "[[ 3 ]] Scanner do Windows", 
-                // "[[ 5 ]] SpeedTest",
+                "[[ 5 ]] SpeedTest",
                 // "[[ 7 ]] Teste de Ping",
                 // "[[ 9 ]] Otimizar Wifi",
                 // "[[ 11 ]] Verificar Temperatura",
