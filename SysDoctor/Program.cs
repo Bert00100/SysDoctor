@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Security.Principal;
-using Spectre.Console;
-
-namespace SysDoctor
+﻿namespace SysDoctor
 {
     class Program
     {
@@ -16,6 +11,7 @@ namespace SysDoctor
                 return;
             }
 
+            // Continua a execução do programa
             bool continuar = true;
 
             while (continuar)
@@ -57,7 +53,8 @@ namespace SysDoctor
                         SpeedTest.Executar();
                         break;
                     case 6:
-                        // Limpar Caches de Wifi/Ethernet
+                        Console.Clear();
+                        ClearEthernet.Executar();
                         break;
                     case 7:
                         // Teste de Ping
@@ -195,7 +192,7 @@ namespace SysDoctor
             {
                 "[[ 2 ]] Limpar SSD/HD",
                 "[[ 4 ]] Limpar Memória RAM",
-                // "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
+                "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
                 // "[[ 8 ]] Otimizar Ping",
                 // "[[ 10 ]] Mapa de Conexão",
                 // "[[ 12 ]] Otimizar Windows",
