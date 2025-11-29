@@ -1274,6 +1274,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1630,7 +1631,7 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.Win32.Registry não será podado. Considere remover este pacote das dependências, pois ele provavelmente é desnecessário.",
+      "message": "PackageReference Microsoft.Win32.Registry will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
       "libraryId": "Microsoft.Win32.Registry",
       "targetGraphs": [
         "net10.0"
