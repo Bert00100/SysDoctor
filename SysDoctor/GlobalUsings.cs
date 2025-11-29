@@ -1,5 +1,6 @@
 global using System;
 global using System.Diagnostics;
+global using System.Diagnostics.Eventing.Reader;
 global using System.Management;
 global using System.Management.Automation;
 global using Spectre.Console;
