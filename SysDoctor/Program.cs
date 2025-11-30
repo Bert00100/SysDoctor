@@ -72,7 +72,8 @@
                         MapNet.Executar();
                         break;
                     case 11:
-                        // Verificar Temperatura
+                        Console.Clear();
+                        checkTemperature.Executar();
                         break;
                     case 12:
                         // Otimizar Windows
@@ -185,7 +186,7 @@
                 "[[ 5 ]] SpeedTest",
                 "[[ 7 ]] Teste de Ping",
                 "[[ 9 ]] Otimizar Wifi",
-                // "[[ 11 ]] Verificar Temperatura",
+                "[[ 11 ]] Verificar Temperatura",
                 // "[[ 13 ]] Criar Ponto de Restauração",
                 // "[[ 15 ]] Atualizar Windows"
                 // "[[ 17 ]] Pack de programas"
