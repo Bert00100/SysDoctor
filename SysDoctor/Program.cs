@@ -68,7 +68,8 @@
                         OtmWifi.Executar();
                         break;
                     case 10:
-                        // Mapa de Conexão
+                        Console.Clear();
+                        MapNet.Executar();
                         break;
                     case 11:
                         // Verificar Temperatura
@@ -196,7 +197,7 @@
                 "[[ 4 ]] Limpar Memória RAM",
                 "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
                 "[[ 8 ]] Ottimizar Ping (DNS Jumper)",
-                // "[[ 10 ]] Mapa de Conexão",
+                "[[ 10 ]] Mapa de Conexão",
                 // "[[ 12 ]] Otimizar Windows",
                 // "[[ 14 ]] Configuração Pós-Instalação",
                 // "[[ 16 ]] Rodar Windows Defender"
