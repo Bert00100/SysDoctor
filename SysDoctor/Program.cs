@@ -2,7 +2,7 @@
 {
     class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Verifica se está rodando como administrador
             if (!IsRunningAsAdministrador())
@@ -48,7 +48,6 @@
                         ClearRAM.Executar();
                         break;
                     case 5:
-                        // SpeedTest
                         Console.Clear();
                         SpeedTest.Executar();
                         break;
@@ -57,7 +56,8 @@
                         ClearEthernet.Executar();
                         break;
                     case 7:
-                        // Teste de Ping
+                        Console.Clear();
+                        await TestPing.Executar();
                         break;
                     case 8:
                         // Otimizar Ping
@@ -99,7 +99,7 @@
                 if (continuar)
                 {
                     AnsiConsole.WriteLine();
-                    CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true); // Mudei de false para true
+                    CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true);
                     Console.ReadKey();
                 }
             }
@@ -180,7 +180,7 @@
                 "[[ 1 ]] Informação da Máquina",
                 "[[ 3 ]] Scanner do Windows", 
                 "[[ 5 ]] SpeedTest",
-                // "[[ 7 ]] Teste de Ping",
+                "[[ 7 ]] Teste de Ping",
                 // "[[ 9 ]] Otimizar Wifi",
                 // "[[ 11 ]] Verificar Temperatura",
                 // "[[ 13 ]] Criar Ponto de Restauração",
