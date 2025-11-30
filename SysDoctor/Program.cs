@@ -64,7 +64,8 @@
                         OtmPing.Executar();
                         break;
                     case 9:
-                        // Otimizar Wifi
+                        Console.Clear();
+                        OtmWifi.Executar();
                         break;
                     case 10:
                         // Mapa de Conexão
@@ -182,7 +183,7 @@
                 "[[ 3 ]] Scanner do Windows", 
                 "[[ 5 ]] SpeedTest",
                 "[[ 7 ]] Teste de Ping",
-                // "[[ 9 ]] Otimizar Wifi",
+                "[[ 9 ]] Otimizar Wifi",
                 // "[[ 11 ]] Verificar Temperatura",
                 // "[[ 13 ]] Criar Ponto de Restauração",
                 // "[[ 15 ]] Atualizar Windows"
