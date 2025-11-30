@@ -79,16 +79,19 @@
                         // Otimizar Windows
                         break;
                     case 13:
-                        // Criar Ponto de Restauração
+                        Console.Clear();
+                        PointReset.Executar();
                         break;
                     case 14:
                         // Configuração Pós-Instalação
                         break;
                     case 15:
-                        // Atualizar Windows
+                        Console.Clear();
+                        UpdateWindows.Executar();
                         break;
                     case 16:
-                        // Rodar Windows Defender
+                        Console.Clear();
+                        RunDefender.Executar();
                         break;
                     case 0:
                         Console.Clear();
@@ -187,8 +190,8 @@
                 "[[ 7 ]] Teste de Ping",
                 "[[ 9 ]] Otimizar Wifi",
                 "[[ 11 ]] Verificar Temperatura",
-                // "[[ 13 ]] Criar Ponto de Restauração",
-                // "[[ 15 ]] Atualizar Windows"
+                "[[ 13 ]] Criar Ponto de Restauração",
+                "[[ 15 ]] Atualizar Windows"
                 // "[[ 17 ]] Pack de programas"
             };
 
@@ -201,7 +204,7 @@
                 "[[ 10 ]] Mapa de Conexão",
                 // "[[ 12 ]] Otimizar Windows",
                 // "[[ 14 ]] Configuração Pós-Instalação",
-                // "[[ 16 ]] Rodar Windows Defender"
+                "[[ 16 ]] Rodar Windows Defender"
                 // "[[ 17 ]] ISO Windows 11 Pro otm"
             };
 
