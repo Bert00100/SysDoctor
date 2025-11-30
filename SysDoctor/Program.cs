@@ -60,7 +60,8 @@
                         await TestPing.Executar();
                         break;
                     case 8:
-                        // Otimizar Ping
+                        Console.Clear();
+                        OtmPing.Executar();
                         break;
                     case 9:
                         // Otimizar Wifi
@@ -193,7 +194,7 @@
                 "[[ 2 ]] Limpar SSD/HD",
                 "[[ 4 ]] Limpar Memória RAM",
                 "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
-                // "[[ 8 ]] Otimizar Ping",
+                "[[ 8 ]] Ottimizar Ping (DNS Jumper)",
                 // "[[ 10 ]] Mapa de Conexão",
                 // "[[ 12 ]] Otimizar Windows",
                 // "[[ 14 ]] Configuração Pós-Instalação",
