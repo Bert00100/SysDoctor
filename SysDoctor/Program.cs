@@ -1,21 +1,52 @@
-﻿namespace SysDoctor
+﻿using SysDoctor.Scripts;
+
+namespace SysDoctor
 {
     class Program
     {
         public static async Task Main(string[] args)
         {
-            // Verifica se está rodando como administrador
+            // Verificação obrigatória de privilégios de administrador
             if (!IsRunningAsAdministrador())
             {
-                RestartAsAdministrator();
+                Console.Clear();
+                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO![/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]⚠️  Este programa REQUER privilégios de Administrador para funcionar![/]");
+                AnsiConsole.MarkupLine("[cyan]📋 Para executar o programa corretamente:[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[white]1. Clique com o botão direito no executável[/]");
+                AnsiConsole.MarkupLine("[white]2. Selecione 'Executar como administrador'[/]");
+                AnsiConsole.MarkupLine("[white]3. Confirme a solicitação do UAC[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[dim]O programa será encerrado agora.[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
+                Console.ReadKey();
+                
+                // Encerra o programa forçadamente
+                Environment.Exit(1);
                 return;
             }
 
-            // Continua a execução do programa
+            // Continua a execução do programa apenas se for administrador
             bool continuar = true;
 
             while (continuar)
             {
+                // Verificação contínua de privilégios de administrador
+                if (!IsRunningAsAdministrador())
+                {
+                    Console.Clear();
+                    AnsiConsole.MarkupLine("[red]❌ PRIVILÉGIOS DE ADMINISTRADOR PERDIDOS![/]");
+                    AnsiConsole.MarkupLine("[yellow]O programa será encerrado por segurança.[/]");
+                    AnsiConsole.WriteLine();
+                    AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
+                    Console.ReadKey();
+                    Environment.Exit(1);
+                    return;
+                }
+
                 Console.Clear();
                 
                 // Exibe o ASCII Art
@@ -76,14 +107,16 @@
                         checkTemperature.Executar();
                         break;
                     case 12:
-                        // Otimizar Windows
+                        Console.Clear();
+                        OtmWindows.Executar();
                         break;
                     case 13:
                         Console.Clear();
                         PointReset.Executar();
                         break;
                     case 14:
-                        // Configuração Pós-Instalação
+                        Console.Clear();
+                        ConfigPosInstall.Executar();
                         break;
                     case 15:
                         Console.Clear();
@@ -93,13 +126,32 @@
                         Console.Clear();
                         RunDefender.Executar();
                         break;
+                    case 17:
+                        Console.Clear();
+                        IsoWin.Executar();
+                        break;
+                    case 18:
+                        Console.Clear();
+                        PackPrograms.Executar();
+                        break;
                     case 0:
                         Console.Clear();
                         CentralizarTexto("[red]Encerrando...[/]", true);
                         continuar = false;
                         break;
                     default:
-                        CentralizarTexto("[red]Opção inválida![/]", true);
+                        Console.Clear();
+                        if (opcao > 18 || opcao < 0)
+                        {
+                            CentralizarTexto("[red]❌ Opção inválida! Digite apenas números de 1 a 18 ou 0 para sair.[/]", true);
+                        }
+                        else
+                        {
+                            CentralizarTexto("[red]❌ Opção inválida![/]", true);
+                        }
+                        AnsiConsole.WriteLine();
+                        CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true);
+                        Console.ReadKey();
                         break;
                 }
 
@@ -116,59 +168,56 @@
         {
             try
             {
+                // Verifica se está no Windows primeiro
+                if (!OperatingSystem.IsWindows())
+                    return false;
+
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
             catch
             {
+                // Se houver qualquer erro, considera como não sendo administrador
                 return false;
-            }
-        }
-
-        private static void RestartAsAdministrator()
-        {
-            try
-            {
-                AnsiConsole.MarkupLine("[yellow]⚠️  O programa precisa de privilégios de Administrador![/]");
-                AnsiConsole.MarkupLine("[cyan]Reiniciando como Administrador...[/]");
-                
-                ProcessStartInfo processInfo = new ProcessStartInfo
-                {
-                    FileName = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location,
-                    UseShellExecute = true,
-                    Verb = "runas"
-                };
-
-                Process.Start(processInfo);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.MarkupLine($"[red]❌ Erro ao tentar reiniciar como Administrador: {ex.Message}[/]");
-                AnsiConsole.MarkupLine("[yellow]Por favor, execute o programa manualmente como Administrador.[/]");
-                AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
-                Console.ReadKey();
             }
         }
 
         private static void MostrarAsciiArt()
         {
             string asciiArt = @"
-         ___    _  _    ___         ____     _____     ___    ____    _____    ____
-        / __)  ( \/ )  / __)       (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
-        \__ \   \  /   \__ \        )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
-        (___/   (__)   (___/  ___  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
+ ___    _  _    ___         ____     _____     ___    ____    _____    ____
+/ __)  ( \/ )  / __)       (  _ \   (  _  )   / __)  (_  _)  (  _  )  (  _ \
+\__ \   \  /   \__ \        )(_) )   )(_)(   ( (__     )(     )(_)(    )   /
+(___/   (__)   (___/  ___  (____/   (_____)   \___)   (__)   (_____)  (_)\_)
             ";
 
             var linhas = asciiArt.Split('\n');
             int larguraTerminal = Console.WindowWidth;
             
+            // Encontra a linha mais larga para usar como referência para centralização
+            int larguraMaxima = 0;
             foreach (var linha in linhas)
             {
-                if (!string.IsNullOrWhiteSpace(linha))
+                if (!string.IsNullOrEmpty(linha.Trim()))
                 {
-                    int padding = Math.Max(0, (larguraTerminal - linha.Length) / 2);
-                    AnsiConsole.MarkupLine("[blue]" + new string(' ', padding) + linha + "[/]");
+                    larguraMaxima = Math.Max(larguraMaxima, linha.Length);
+                }
+            }
+            
+            // Centraliza baseado na largura máxima encontrada
+            int paddingBase = Math.Max(0, (larguraTerminal - larguraMaxima) / 2);
+            
+            foreach (var linha in linhas)
+            {
+                if (!string.IsNullOrEmpty(linha.Trim()))
+                {
+                    AnsiConsole.MarkupLine("[blue]" + new string(' ', paddingBase) + linha + "[/]");
+                }
+                else if (!string.IsNullOrEmpty(linha))
+                {
+                    // Para linhas que contêm apenas espaços, mantém uma linha em branco
+                    AnsiConsole.WriteLine();
                 }
             }
             
@@ -191,8 +240,8 @@
                 "[[ 9 ]] Otimizar Wifi",
                 "[[ 11 ]] Verificar Temperatura",
                 "[[ 13 ]] Criar Ponto de Restauração",
-                "[[ 15 ]] Atualizar Windows"
-                // "[[ 17 ]] Pack de programas"
+                "[[ 15 ]] Atualizar Windows",
+                "[[ 17 ]] Pack de programas"
             };
 
             var opcoesDir = new[]
@@ -202,10 +251,10 @@
                 "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
                 "[[ 8 ]] Ottimizar Ping (DNS Jumper)",
                 "[[ 10 ]] Mapa de Conexão",
-                // "[[ 12 ]] Otimizar Windows",
-                // "[[ 14 ]] Configuração Pós-Instalação",
-                "[[ 16 ]] Rodar Windows Defender"
-                // "[[ 17 ]] ISO Windows 11 Pro otm"
+                "[[ 12 ]] Otimizar Windows",
+                "[[ 14 ]] Configuração Pós-Instalação",
+                "[[ 16 ]] Rodar Windows Defender",
+                "[[ 18 ]] ISO Windows 11 Pro otm"
             };
 
             // Cria uma tabela para melhor organização
