@@ -10,167 +10,143 @@ namespace SysDoctor
     {
         public static async Task Main(string[] args)
         {
-            // Configurar o terminal para suportar UTF-8 e emojis
-            ConfigurarTerminalParaEmojis();
-
-            // Verificação obrigatória de privilégios de administrador
-            if (!IsRunningAsAdministrador())
+            try
             {
-                Console.Clear();
-                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO![/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]⚠️  Este programa REQUER privilégios de Administrador para funcionar![/]");
-                AnsiConsole.MarkupLine("[cyan]📋 Para executar o programa corretamente:[/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[white]1. Clique com o botão direito no executável[/]");
-                AnsiConsole.MarkupLine("[white]2. Selecione 'Executar como administrador'[/]");
-                AnsiConsole.MarkupLine("[white]3. Confirme a solicitação do UAC[/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[dim]O programa será encerrado agora.[/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
-                Console.ReadKey();
-                
-                // Encerra o programa forçadamente
-                Environment.Exit(1);
-                return;
-            }
+                // Configurar o terminal para suportar UTF-8 e emojis
+                ConfigurarTerminalParaEmojis();
 
-            // Continua a execução do programa apenas se for administrador
-            bool continuar = true;
+                // Continua a execução do programa
+                bool continuar = true;
 
-            while (continuar)
-            {
-                // Verificação contínua de privilégios de administrador
-                if (!IsRunningAsAdministrador())
+                while (continuar)
                 {
+
                     Console.Clear();
-                    AnsiConsole.MarkupLine("[red]❌ PRIVILÉGIOS DE ADMINISTRADOR PERDIDOS![/]");
-                    AnsiConsole.MarkupLine("[yellow]O programa será encerrado por segurança.[/]");
-                    AnsiConsole.WriteLine();
-                    AnsiConsole.Markup("[dim]Pressione qualquer tecla para sair...[/]");
-                    Console.ReadKey();
-                    Environment.Exit(1);
-                    return;
-                }
+                    
+                    // Exibe status de administrador no topo
+                    MostrarStatusAdministrador();
+                    
+                    // Exibe o ASCII Art
+                    MostrarAsciiArt();
 
-                Console.Clear();
-                
-                // Exibe status de administrador no topo
-                MostrarStatusAdministrador();
-                
-                // Exibe o ASCII Art
-                MostrarAsciiArt();
+                    // Exibe o menu dividido em duas colunas
+                    MostrarMenu();
 
-                // Exibe o menu dividido em duas colunas
-                MostrarMenu();
+                    // Centraliza o input
+                    CentralizarInput();
 
-                // Centraliza o input
-                CentralizarInput();
+                    int.TryParse(Console.ReadLine(), out int opcao);
 
-                int.TryParse(Console.ReadLine(), out int opcao);
+                    switch (opcao)
+                    {
+                        case 1:
+                            Console.Clear();
+                            ExecutarComTratamento(() => InfoMachine.Executar(), "Informação da Máquina");
+                            break;
+                        case 2:
+                            Console.Clear();
+                            ExecutarComTratamento(() => ClearDisk.Executar(), "Limpeza de Disco");
+                            break;
+                        case 3:
+                            Console.Clear();
+                            ExecutarComTratamento(() => ScanWindow.Executar(), "Scanner do Windows");
+                            break;
+                        case 4:
+                            Console.Clear();
+                            ExecutarComTratamento(() => ClearRAM.Executar(), "Limpeza de RAM");
+                            break;
+                        case 5:
+                            Console.Clear();
+                            ExecutarComTratamento(() => SpeedTest.Executar(), "SpeedTest");
+                            break;
+                        case 6:
+                            Console.Clear();
+                            ExecutarComTratamento(() => ClearEthernet.Executar(), "Limpeza de Ethernet");
+                            break;
+                        case 7:
+                            Console.Clear();
+                            ExecutarComTratamentoAsync(async () => await TestPing.Executar(), "Teste de Ping");
+                            break;
+                        case 8:
+                            Console.Clear();
+                            ExecutarComTratamento(() => OtmPing.Executar(), "Otimizar Ping");
+                            break;
+                        case 9:
+                            Console.Clear();
+                            ExecutarComTratamento(() => OtmWifi.Executar(), "Otimizar Wifi");
+                            break;
+                        case 10:
+                            Console.Clear();
+                            ExecutarComTratamento(() => MapNet.Executar(), "Mapa de Conexão");
+                            break;
+                        case 11:
+                            Console.Clear();
+                            ExecutarComTratamento(() => checkTemperature.Executar(), "Verificar Temperatura");
+                            break;
+                        case 12:
+                            Console.Clear();
+                            ExecutarComTratamento(() => OtmWindows.Executar(), "Otimizar Windows");
+                            break;
+                        case 13:
+                            Console.Clear();
+                            ExecutarComTratamento(() => PointReset.Executar(), "Criar Ponto de Restauração");
+                            break;
+                        case 14:
+                            Console.Clear();
+                            ExecutarComTratamento(() => ConfigPosInstall.Executar(), "Configuração Pós-Instalação");
+                            break;
+                        case 15:
+                            Console.Clear();
+                            ExecutarComTratamento(() => UpdateWindows.Executar(), "Atualizar Windows");
+                            break;
+                        case 16:
+                            Console.Clear();
+                            ExecutarComTratamento(() => RunDefender.Executar(), "Rodar Windows Defender");
+                            break;
+                        case 17:
+                            Console.Clear();
+                            ExecutarComTratamento(() => IsoWin.Executar(), "ISO Windows");
+                            break;
+                        case 18:
+                            Console.Clear();
+                            ExecutarComTratamento(() => PackPrograms.Executar(), "Pack de Programas");
+                            break;
+                        case 0:
+                            Console.Clear();
+                            CentralizarTexto("[red]Encerrando...[/]", true);
+                            continuar = false;
+                            break;
+                        default:
+                            Console.Clear();
+                            if (opcao > 18 || opcao < 0)
+                            {
+                                CentralizarTexto("[red]❌ Opção inválida! Digite apenas números de 1 a 18 ou 0 para sair.[/]", true);
+                            }
+                            else
+                            {
+                                CentralizarTexto("[red]❌ Opção inválida![/]", true);
+                            }
+                            AnsiConsole.WriteLine();
+                            CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true);
+                            Console.ReadKey();
+                            break;
+                    }
 
-                switch (opcao)
-                {
-                    case 1:
-                        Console.Clear();
-                        InfoMachine.Executar();
-                        break;
-                    case 2:
-                        Console.Clear();
-                        ClearDisk.Executar();
-                        break;
-                    case 3:
-                        Console.Clear();
-                        ScanWindow.Executar();
-                        break;
-                    case 4:
-                        Console.Clear();
-                        ClearRAM.Executar();
-                        break;
-                    case 5:
-                        Console.Clear();
-                        SpeedTest.Executar();
-                        break;
-                    case 6:
-                        Console.Clear();
-                        ClearEthernet.Executar();
-                        break;
-                    case 7:
-                        Console.Clear();
-                        await TestPing.Executar();
-                        break;
-                    case 8:
-                        Console.Clear();
-                        OtmPing.Executar();
-                        break;
-                    case 9:
-                        Console.Clear();
-                        OtmWifi.Executar();
-                        break;
-                    case 10:
-                        Console.Clear();
-                        MapNet.Executar();
-                        break;
-                    case 11:
-                        Console.Clear();
-                        checkTemperature.Executar();
-                        break;
-                    case 12:
-                        Console.Clear();
-                        OtmWindows.Executar();
-                        break;
-                    case 13:
-                        Console.Clear();
-                        PointReset.Executar();
-                        break;
-                    case 14:
-                        Console.Clear();
-                        ConfigPosInstall.Executar();
-                        break;
-                    case 15:
-                        Console.Clear();
-                        UpdateWindows.Executar();
-                        break;
-                    case 16:
-                        Console.Clear();
-                        RunDefender.Executar();
-                        break;
-                    case 17:
-                        Console.Clear();
-                        IsoWin.Executar();
-                        break;
-                    case 18:
-                        Console.Clear();
-                        PackPrograms.Executar();
-                        break;
-                    case 0:
-                        Console.Clear();
-                        CentralizarTexto("[red]Encerrando...[/]", true);
-                        continuar = false;
-                        break;
-                    default:
-                        Console.Clear();
-                        if (opcao > 18 || opcao < 0)
-                        {
-                            CentralizarTexto("[red]❌ Opção inválida! Digite apenas números de 1 a 18 ou 0 para sair.[/]", true);
-                        }
-                        else
-                        {
-                            CentralizarTexto("[red]❌ Opção inválida![/]", true);
-                        }
+                    if (continuar)
+                    {
                         AnsiConsole.WriteLine();
                         CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true);
                         Console.ReadKey();
-                        break;
+                    }
                 }
-
-                if (continuar)
-                {
-                    AnsiConsole.WriteLine();
-                    CentralizarTexto("[dim]Pressione qualquer tecla para continuar...[/]", true);
-                    Console.ReadKey();
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n\nERRO FATAL:\n" + ex.ToString());
+                Console.ResetColor();
+                Console.WriteLine("\nPressione qualquer tecla para sair...");
+                Console.ReadKey();
             }
         }
 
@@ -366,21 +342,99 @@ namespace SysDoctor
             Console.WriteLine();
             int larguraTerminal = Console.WindowWidth;
             
-            // Linha superior
-            string linhaSuperior = "╔═══════════════════════════════════════════════════════════╗";
-            int paddingSuperior = Math.Max(0, (larguraTerminal - linhaSuperior.Length) / 2);
-            Console.WriteLine(new string(' ', paddingSuperior) + linhaSuperior);
+            bool temPrivilegios = IsRunningAsAdministrador();
             
-            // Status de administrador
-            string statusAdmin = "║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║";
-            int paddingStatus = Math.Max(0, (larguraTerminal - statusAdmin.Length) / 2);
-            AnsiConsole.MarkupLine(new string(' ', paddingStatus) + "[bold green]║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║[/]");
+            if (temPrivilegios)
+            {
+                // Linha superior
+                string linhaSuperior = "╔═══════════════════════════════════════════════════════════╗";
+                int paddingSuperior = Math.Max(0, (larguraTerminal - linhaSuperior.Length) / 2);
+                Console.WriteLine(new string(' ', paddingSuperior) + linhaSuperior);
+                
+                // Status de administrador
+                string statusAdmin = "║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║";
+                int paddingStatus = Math.Max(0, (larguraTerminal - statusAdmin.Length) / 2);
+                AnsiConsole.MarkupLine(new string(' ', paddingStatus) + "[bold green]║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║[/]");
+                
+                // Linha inferior
+                string linhaInferior = "╚═══════════════════════════════════════════════════════════╝";
+                int paddingInferior = Math.Max(0, (larguraTerminal - linhaInferior.Length) / 2);
+                Console.WriteLine(new string(' ', paddingInferior) + linhaInferior);
+            }
+            else
+            {
+                // Linha superior
+                string linhaSuperior = "╔═══════════════════════════════════════════════════════════╗";
+                int paddingSuperior = Math.Max(0, (larguraTerminal - linhaSuperior.Length) / 2);
+                Console.WriteLine(new string(' ', paddingSuperior) + linhaSuperior);
+                
+                // Status sem administrador
+                string statusAdmin = "║    ⚠️  SEM PRIVILÉGIOS DE ADMINISTRADOR - NÃO RECOMENDADO   ║";
+                int paddingStatus = Math.Max(0, (larguraTerminal - statusAdmin.Length) / 2);
+                AnsiConsole.MarkupLine(new string(' ', paddingStatus) + "[bold yellow]║    ⚠️  SEM PRIVILÉGIOS DE ADMINISTRADOR - NÃO RECOMENDADO   ║[/]");
+                
+                // Linha inferior
+                string linhaInferior = "╚═══════════════════════════════════════════════════════════╝";
+                int paddingInferior = Math.Max(0, (larguraTerminal - linhaInferior.Length) / 2);
+                Console.WriteLine(new string(' ', paddingInferior) + linhaInferior);
+            }
             
-            // Linha inferior
-            string linhaInferior = "╚═══════════════════════════════════════════════════════════╝";
-            int paddingInferior = Math.Max(0, (larguraTerminal - linhaInferior.Length) / 2);
-            Console.WriteLine(new string(' ', paddingInferior) + linhaInferior);
             Console.WriteLine();
+        }
+
+        private static void ExecutarComTratamento(Action acao, string nomeFuncionalidade)
+        {
+            try
+            {
+                acao.Invoke();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
+                AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
+                AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
+                AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine("[red]❌ ERRO ao executar " + nomeFuncionalidade + "[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]Erro: " + ex.Message + "[/]");
+            }
+        }
+
+        private static void ExecutarComTratamentoAsync(Func<Task> acao, string nomeFuncionalidade)
+        {
+            try
+            {
+                acao.Invoke().Wait();
+            }
+            catch (AggregateException aex) when (aex.InnerException is UnauthorizedAccessException)
+            {
+                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
+                AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
+                AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
+                AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
+                AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
+                AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
+                AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine("[red]❌ ERRO ao executar " + nomeFuncionalidade + "[/]");
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]Erro: " + ex.Message + "[/]");
+            }
         }
     }
 }

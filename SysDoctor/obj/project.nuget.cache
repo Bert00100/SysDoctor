@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "GYP7kIQryys=",
+  "dgSpecHash": "Y2g+at5U3eU=",
   "success": true,
   "projectFilePath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
   "expectedPackageFiles": [
@@ -38,7 +38,7 @@
     {
       "code": "NU1510",
       "level": "Warning",
-      "message": "PackageReference Microsoft.Win32.Registry não será podado. Considere remover este pacote das dependências, pois\u00A0ele provavelmente é desnecessário.",
+      "message": "PackageReference Microsoft.Win32.Registry will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
       "projectPath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
