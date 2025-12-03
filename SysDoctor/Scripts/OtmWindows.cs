@@ -1382,67 +1382,130 @@ namespace SysDoctor.Scripts
                     .LeftJustified()
                     .Color(Color.Yellow));
 
-            AnsiConsole.Status()
-                .Start($"[yellow]🔒 {(desativar ? "Desativando" : "Reativando")} UAC...[/]", ctx => 
+            Console.WriteLine();
+            AnsiConsole.MarkupLine("[cyan]═══════════════════════════════════════════════════════════════════════════════[/]");
+            
+            try
+            {
+                // Verificação de integridade
+                AnsiConsole.MarkupLine("[yellow]🔍 Verificando integridade do sistema (sfc /scannow)...[/]");
+                AnsiConsole.WriteLine();
+                
+                ProcessStartInfo psiSfc = new ProcessStartInfo
                 {
-                    try
+                    FileName = "cmd.exe",
+                    Arguments = "/c sfc /scannow",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (Process sfc = Process.Start(psiSfc))
+                {
+                    // Ler saída em tempo real
+                    using (var reader = sfc.StandardOutput)
                     {
-                        // Verificação de integridade
-                        ctx.Status("[yellow]Verificando integridade do sistema...[/]");
-                        
-                        ProcessStartInfo psiSfc = new ProcessStartInfo
+                        string linha;
+                        while ((linha = reader.ReadLine()) != null)
                         {
-                            FileName = "powershell.exe",
-                            Arguments = "-Command \"sfc /scannow\"",
-                            UseShellExecute = false,
-                            RedirectStandardError = true,
-                            CreateNoWindow = true
-                        };
-
-                        using (Process sfc = Process.Start(psiSfc))
-                        {
-                            sfc.WaitForExit();
-                            AnsiConsole.MarkupLine("[green]✓ Verificação de integridade concluída[/]");
-                        }
-
-                        // Alterar UAC
-                        ctx.Status($"[yellow]{(desativar ? "Desativando" : "Reativando")} UAC...[/]");
-                        
-                        string valor = desativar ? "0" : "1";
-                        string cmd = $@"reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v EnableLUA /t REG_DWORD /d {valor} /f";
-                        
-                        ProcessStartInfo psi = new ProcessStartInfo
-                        {
-                            FileName = "powershell.exe",
-                            Arguments = $"-Command \"{cmd}\"",
-                            UseShellExecute = false,
-                            RedirectStandardError = true,
-                            CreateNoWindow = true
-                        };
-
-                        using (Process proc = Process.Start(psi))
-                        {
-                            string stderr = proc.StandardError.ReadToEnd();
-                            proc.WaitForExit();
-
-                            if (proc.ExitCode != 0)
+                            // Destacar linhas importantes
+                            if (linha.Contains("Scanning", StringComparison.OrdinalIgnoreCase) || 
+                                linha.Contains("Found", StringComparison.OrdinalIgnoreCase) ||
+                                linha.Contains("Verifying", StringComparison.OrdinalIgnoreCase) ||
+                                linha.Contains("Repairing", StringComparison.OrdinalIgnoreCase))
                             {
-                                AnsiConsole.MarkupLine($"[red]❌ Erro ao {(desativar ? "desativar" : "reativar")} UAC: {stderr.Trim()}[/]");
-                                erros.Add("EnableLUA");
+                                AnsiConsole.MarkupLine($"[blue]{linha}[/]");
                             }
-                            else
+                            else if (linha.Contains("100%", StringComparison.OrdinalIgnoreCase) ||
+                                     linha.Contains("completed", StringComparison.OrdinalIgnoreCase))
                             {
-                                AnsiConsole.MarkupLine($"[green]✓ UAC {(desativar ? "desativado" : "reativado")} com sucesso[/]");
+                                AnsiConsole.MarkupLine($"[green]{linha}[/]");
+                            }
+                            else if (linha.Contains("Error", StringComparison.OrdinalIgnoreCase) ||
+                                     linha.Contains("failed", StringComparison.OrdinalIgnoreCase))
+                            {
+                                AnsiConsole.MarkupLine($"[red]{linha}[/]");
+                            }
+                            else if (!string.IsNullOrWhiteSpace(linha))
+                            {
+                                Console.WriteLine(linha);
                             }
                         }
                     }
-                    catch (Exception ex)
+                    
+                    sfc.WaitForExit();
+                    
+                    if (sfc.ExitCode == 0)
                     {
-                        AnsiConsole.MarkupLine($"[red]❌ Erro: {ex.Message}[/]");
-                        erros.Add(ex.Message);
+                        AnsiConsole.MarkupLine("\n[green]✓ Verificação de integridade concluída com sucesso![/]");
                     }
-                });
+                    else
+                    {
+                        AnsiConsole.MarkupLine($"\n[yellow]⚠️ Verificação de integridade concluída com código de saída: {sfc.ExitCode}[/]");
+                    }
+                }
 
+                Console.WriteLine();
+                AnsiConsole.MarkupLine("[cyan]═══════════════════════════════════════════════════════════════════════════════[/]");
+                AnsiConsole.WriteLine();
+
+                // Alterar UAC
+                AnsiConsole.MarkupLine($"[yellow]🔒 {(desativar ? "Desativando" : "Reativando")} UAC...[/]");
+                AnsiConsole.WriteLine();
+                
+                string valor = desativar ? "0" : "1";
+                string cmd = $@"reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v EnableLUA /t REG_DWORD /d {valor} /f";
+                
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c {cmd}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (Process proc = Process.Start(psi))
+                {
+                    // Ler saída em tempo real
+                    using (var reader = proc.StandardOutput)
+                    {
+                        string linha;
+                        while ((linha = reader.ReadLine()) != null)
+                        {
+                            if (!string.IsNullOrWhiteSpace(linha))
+                            {
+                                AnsiConsole.MarkupLine($"[blue]{linha}[/]");
+                            }
+                        }
+                    }
+
+                    string stderr = proc.StandardError.ReadToEnd();
+                    proc.WaitForExit();
+
+                    if (proc.ExitCode != 0)
+                    {
+                        AnsiConsole.MarkupLine($"[red]❌ Erro ao {(desativar ? "desativar" : "reativar")} UAC: {stderr.Trim()}[/]");
+                        erros.Add("EnableLUA");
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine($"[green]✓ UAC {(desativar ? "desativado" : "reativado")} com sucesso[/]");
+                    }
+                }
+
+                Console.WriteLine();
+                AnsiConsole.MarkupLine("[cyan]═══════════════════════════════════════════════════════════════════════════════[/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]❌ Erro: {ex.Message}[/]");
+                erros.Add(ex.Message);
+            }
+
+            Console.WriteLine();
             if (erros.Count > 0)
             {
                 AnsiConsole.MarkupLine($"[red]❌ Ocorreram erros: {string.Join(", ", erros)}[/]");
@@ -1714,59 +1777,123 @@ namespace SysDoctor.Scripts
                     .LeftJustified()
                     .Color(Color.Yellow));
 
-            AnsiConsole.Status()
-                .Start($"[yellow]💻 {(desativar ? "Desativando" : "Ativando")} Hyper-V...[/]", ctx => 
-                {
-                    try
-                    {
-                        string[] features = new string[] { "Microsoft-Hyper-V-All", "VirtualMachinePlatform", "HypervisorPlatform" };
-                        string[] nomes = new string[] { "Hyper-V", "Virtual Machine Platform", "Hypervisor Platform" };
-                        string acao = desativar ? "Disable" : "Enable";
+            Console.WriteLine();
+            AnsiConsole.MarkupLine("[cyan]═══════════════════════════════════════════════════════════════════════════════[/]");
 
-                        for (int i = 0; i < features.Length; i++)
+            var stopwatch = Stopwatch.StartNew();
+            
+            string[] features = new string[] { "Microsoft-Hyper-V-All", "VirtualMachinePlatform", "HypervisorPlatform" };
+            string[] nomes = new string[] { "Hyper-V", "Virtual Machine Platform", "Hypervisor Platform" };
+            string acao = desativar ? "Disable" : "Enable";
+            int totalPassos = features.Length;
+
+            AnsiConsole.Progress()
+                .AutoClear(false)
+                .Columns(new ProgressColumn[]
+                {
+                    new TaskDescriptionColumn(),
+                    new ProgressBarColumn(),
+                    new PercentageColumn(),
+                    new ElapsedTimeColumn(),
+                })
+                .Start(ctx =>
+                {
+                    var task = ctx.AddTask($"[cyan]{(desativar ? "Desativando" : "Ativando")} Hyper-V...[/]", maxValue: totalPassos);
+
+                    for (int i = 0; i < features.Length; i++)
+                    {
+                        task.Description = $"[cyan]Passo {i + 1}/{totalPassos}: {(desativar ? "Desativando" : "Ativando")} {nomes[i]}...[/]";
+                        task.Value = i;
+
+                        try
                         {
-                            ctx.Status($"[yellow]{(desativar ? "Desativando" : "Ativando")} {nomes[i]}...[/]");
-                            
                             ProcessStartInfo psi = new ProcessStartInfo
                             {
                                 FileName = "powershell.exe",
                                 Arguments = $"-Command \"{acao}-WindowsOptionalFeature -Online -FeatureName {features[i]} -NoRestart\"",
                                 UseShellExecute = false,
+                                RedirectStandardOutput = true,
                                 RedirectStandardError = true,
                                 CreateNoWindow = true
                             };
 
                             using (Process proc = Process.Start(psi))
                             {
+                                // Ler saída em tempo real
+                                using (var reader = proc.StandardOutput)
+                                {
+                                    string linha;
+                                    while ((linha = reader.ReadLine()) != null)
+                                    {
+                                        // Destacar linhas importantes
+                                        if (linha.Contains("Success", StringComparison.OrdinalIgnoreCase) ||
+                                            linha.Contains("Enabled", StringComparison.OrdinalIgnoreCase) ||
+                                            linha.Contains("Disabled", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            AnsiConsole.MarkupLine($"[green]{linha}[/]");
+                                        }
+                                        else if (linha.Contains("Error", StringComparison.OrdinalIgnoreCase) ||
+                                                 linha.Contains("failed", StringComparison.OrdinalIgnoreCase) ||
+                                                 linha.Contains("Exception", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            AnsiConsole.MarkupLine($"[red]{linha}[/]");
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(linha))
+                                        {
+                                            AnsiConsole.MarkupLine($"[blue]{linha}[/]");
+                                        }
+                                    }
+                                }
+
                                 string stderr = proc.StandardError.ReadToEnd();
                                 proc.WaitForExit();
 
                                 if (proc.ExitCode != 0)
                                 {
-                                    AnsiConsole.MarkupLine($"[yellow]⚠️ {nomes[i]} - pode não estar disponível[/]");
+                                    if (!string.IsNullOrWhiteSpace(stderr) && !stderr.Contains("already", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        AnsiConsole.MarkupLine($"[yellow]⚠️ {nomes[i]} - {stderr.Trim()}[/]");
+                                        erros.Add(nomes[i]);
+                                    }
+                                    else
+                                    {
+                                        AnsiConsole.MarkupLine($"[yellow]ℹ️ {nomes[i]} - já estava {(desativar ? "desativado" : "ativado")}[/]");
+                                    }
                                 }
                                 else
                                 {
-                                    AnsiConsole.MarkupLine($"[green]✓ {nomes[i]} {(desativar ? "desativado" : "ativado")}[/]");
+                                    AnsiConsole.MarkupLine($"[green]✓ {nomes[i]} {(desativar ? "desativado" : "ativado")} com sucesso[/]");
                                 }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            AnsiConsole.MarkupLine($"[red]❌ Erro ao {(desativar ? "desativar" : "ativar")} {nomes[i]}: {ex.Message}[/]");
+                            erros.Add(nomes[i]);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        AnsiConsole.MarkupLine($"[red]❌ Erro: {ex.Message}[/]");
-                        erros.Add(ex.Message);
-                    }
+
+                    task.Value = totalPassos;
+                    task.StopTask();
                 });
+
+            stopwatch.Stop();
+            Console.WriteLine();
+            AnsiConsole.MarkupLine("[cyan]═══════════════════════════════════════════════════════════════════════════════[/]");
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[cyan]⏱️ Tempo total: {stopwatch.Elapsed:mm\\:ss}[/]");
 
             if (erros.Count > 0)
             {
-                AnsiConsole.MarkupLine($"[red]❌ Ocorreram erros: {string.Join(", ", erros)}[/]");
+                AnsiConsole.MarkupLine($"[yellow]⚠️ Ocorreram avisos: {string.Join(", ", erros)}[/]");
+                AnsiConsole.MarkupLine("[yellow]💡 Alguns recursos podem não estar disponíveis nesta versão do Windows[/]");
             }
             else
             {
-                AnsiConsole.MarkupLine($"[green]✓ Operação concluída! Reinicie o PC para aplicar as mudanças.[/]");
+                AnsiConsole.MarkupLine($"[green]✓ Operação concluída com sucesso![/]");
             }
+
+            AnsiConsole.MarkupLine("[yellow]⚠️ Reinicie o PC para aplicar as mudanças.[/]");
         }
 
         // Opção 12: Desativar Aero Peek

@@ -105,11 +105,11 @@ namespace SysDoctor
                             break;
                         case 17:
                             Console.Clear();
-                            ExecutarComTratamento(() => IsoWin.Executar(), "ISO Windows");
+                            ExecutarComTratamento(() => PackPrograms.Executar(), "Pack de Programas");
                             break;
                         case 18:
                             Console.Clear();
-                            ExecutarComTratamento(() => PackPrograms.Executar(), "Pack de Programas");
+                            ExecutarComTratamento(() => IsoWin.Executar(), "ISO Windows");
                             break;
                         case 0:
                             Console.Clear();
@@ -269,7 +269,7 @@ namespace SysDoctor
                 "[[ 12 ]] Otimizar Windows",
                 "[[ 14 ]] Configuração Pós-Instalação",
                 "[[ 16 ]] Rodar Windows Defender",
-                //"[[ 18 ]] ISO Windows 11 Pro otm"
+                "[[ 18 ]] ISO Windows 11 Pro otm"
             };
 
             // Cria uma tabela para melhor organização

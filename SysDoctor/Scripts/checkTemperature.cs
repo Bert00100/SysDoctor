@@ -71,7 +71,12 @@ namespace SysDoctor.Scripts
                 ExibirDicasTemperatura();
 
                 // Opção para monitoramento contínuo
-                if (AnsiConsole.Confirm("Deseja iniciar monitoramento contínuo por 30 segundos?"))
+                var confirmar = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("[cyan]Deseja iniciar monitoramento contínuo por 30 segundos?[/]")
+                        .AddChoices(new[] { "Sim", "Não" }));
+
+                if (confirmar == "Sim")
                 {
                     MonitoramentoContinuo();
                 }

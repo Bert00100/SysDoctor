@@ -4,26 +4,42 @@ namespace SysDoctor.Scripts
     {
         public static void Executar()
         {
-            AnsiConsole.MarkupLine("[blue]Otimizador de Wifi[/]");
-            AnsiConsole.MarkupLine("[yellow]As ações a seguir podem levar algum tempo...[/]");
-            AnsiConsole.WriteLine();
+            AnsiConsole.Write(
+                new FigletText("Otimizador de WiFi")
+                    .LeftJustified()
+                    .Color(Color.Blue));
 
-            Console.WriteLine("[1] - OTIMIZAR");
-            Console.WriteLine("[2] - REVERTER");
-            Console.Write("opcao: ");
-            int.TryParse(Console.ReadLine(), out int op);
+            AnsiConsole.MarkupLine("[yellow]⚡ Otimize as configurações de rede para melhor desempenho...[/]\n");
 
-            if (op == 1)
+            var opcao = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[blue]Escolha a opção:[/]")
+                    .AddChoices(new[] { 
+                        "Otimizar WiFi", 
+                        "Reverter Configurações",
+                        "Cancelar"
+                    }));
+
+            if (opcao == "Cancelar")
+            {
+                return;
+            }
+
+            bool otimizar = opcao.StartsWith("Otimizar");
+
+            Console.Clear();
+            AnsiConsole.Write(
+                new FigletText(otimizar ? "Otimizando" : "Revertendo")
+                    .LeftJustified()
+                    .Color(Color.Yellow));
+
+            if (otimizar)
             {
                 OtimizarWifi();
             }
-            else if (op == 2)
-            {
-                ReverterWifi();
-            }
             else
             {
-                Console.WriteLine("Opção inválida.");
+                ReverterWifi();
             }
         }
 

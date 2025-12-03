@@ -28,9 +28,12 @@ namespace SysDoctor.Scripts
                 if (melhorDNS.HasValue)
                 {
                     // Pergunta se o usuário quer aplicar o melhor DNS
-                    var aplicar = AnsiConsole.Confirm($"Deseja aplicar o DNS mais rápido ({melhorDNS.Value.Nome})?");
+                    var aplicar = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title($"[cyan]Deseja aplicar o DNS mais rápido ({melhorDNS.Value.Nome})?[/]")
+                            .AddChoices(new[] { "Sim", "Não" }));
                     
-                    if (aplicar)
+                    if (aplicar == "Sim")
                     {
                         ConfigurarDNS(melhorDNS.Value.Primario, melhorDNS.Value.Secundario, melhorDNS.Value.Nome);
                     }
