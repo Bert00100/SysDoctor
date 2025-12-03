@@ -1,4 +1,8 @@
 ﻿using SysDoctor.Scripts;
+using Spectre.Console;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace SysDoctor
 {
@@ -6,6 +10,9 @@ namespace SysDoctor
     {
         public static async Task Main(string[] args)
         {
+            // Configurar o terminal para suportar UTF-8 e emojis
+            ConfigurarTerminalParaEmojis();
+
             // Verificação obrigatória de privilégios de administrador
             if (!IsRunningAsAdministrador())
             {
@@ -48,6 +55,9 @@ namespace SysDoctor
                 }
 
                 Console.Clear();
+                
+                // Exibe status de administrador no topo
+                MostrarStatusAdministrador();
                 
                 // Exibe o ASCII Art
                 MostrarAsciiArt();
@@ -164,6 +174,35 @@ namespace SysDoctor
             }
         }
 
+        private static void ConfigurarTerminalParaEmojis()
+        {
+            try
+            {
+                // Configura o terminal para UTF-8
+                Console.OutputEncoding = Encoding.UTF8;
+                Console.InputEncoding = Encoding.UTF8;
+                
+                // Ativa suporte a caracteres Unicode no Windows
+                if (OperatingSystem.IsWindows())
+                {
+                    // Define o code page para UTF-8
+                    SetConsoleOutputCP(65001);
+                    SetConsoleCP(65001);
+                }
+            }
+            catch
+            {
+                // Se falhar, continua sem configuração especial
+            }
+        }
+
+        // APIs do Windows para suporte a emojis
+        [DllImport("kernel32.dll")]
+        private static extern bool SetConsoleOutputCP(uint wCodePageID);
+
+        [DllImport("kernel32.dll")]
+        private static extern bool SetConsoleCP(uint wCodePageID);
+
         private static bool IsRunningAsAdministrador()
         {
             try
@@ -249,12 +288,12 @@ namespace SysDoctor
                 "[[ 2 ]] Limpar SSD/HD",
                 "[[ 4 ]] Limpar Memória RAM",
                 "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
-                "[[ 8 ]] Ottimizar Ping (DNS Jumper)",
+                "[[ 8 ]] Otimizar Ping ",
                 "[[ 10 ]] Mapa de Conexão",
                 "[[ 12 ]] Otimizar Windows",
                 "[[ 14 ]] Configuração Pós-Instalação",
                 "[[ 16 ]] Rodar Windows Defender",
-                "[[ 18 ]] ISO Windows 11 Pro otm"
+                //"[[ 18 ]] ISO Windows 11 Pro otm"
             };
 
             // Cria uma tabela para melhor organização
@@ -320,6 +359,28 @@ namespace SysDoctor
             
             Console.Write(new string(' ', padding));
             AnsiConsole.Markup("[cyan]🎯 Digite sua opção: [/]");
+        }
+
+        private static void MostrarStatusAdministrador()
+        {
+            Console.WriteLine();
+            int larguraTerminal = Console.WindowWidth;
+            
+            // Linha superior
+            string linhaSuperior = "╔═══════════════════════════════════════════════════════════╗";
+            int paddingSuperior = Math.Max(0, (larguraTerminal - linhaSuperior.Length) / 2);
+            Console.WriteLine(new string(' ', paddingSuperior) + linhaSuperior);
+            
+            // Status de administrador
+            string statusAdmin = "║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║";
+            int paddingStatus = Math.Max(0, (larguraTerminal - statusAdmin.Length) / 2);
+            AnsiConsole.MarkupLine(new string(' ', paddingStatus) + "[bold green]║           🛡️  EXECUTANDO COMO ADMINISTRADOR ✅           ║[/]");
+            
+            // Linha inferior
+            string linhaInferior = "╚═══════════════════════════════════════════════════════════╝";
+            int paddingInferior = Math.Max(0, (larguraTerminal - linhaInferior.Length) / 2);
+            Console.WriteLine(new string(' ', paddingInferior) + linhaInferior);
+            Console.WriteLine();
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ep7fbrTpdz0=",
+  "dgSpecHash": "GYP7kIQryys=",
   "success": true,
   "projectFilePath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.management.infrastructure\\3.0.0\\microsoft.management.infrastructure.3.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.management.infrastructure.runtime.unix\\3.0.0\\microsoft.management.infrastructure.runtime.unix.3.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.management.infrastructure.runtime.win\\3.0.0\\microsoft.management.infrastructure.runtime.win.3.0.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.net.illink.tasks\\10.0.0\\microsoft.net.illink.tasks.10.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.powershell.coreclr.eventing\\7.4.0\\microsoft.powershell.coreclr.eventing.7.4.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.powershell.native\\7.4.0\\microsoft.powershell.native.7.4.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.security.extensions\\1.2.0\\microsoft.security.extensions.1.2.0.nupkg.sha512",
@@ -28,7 +29,10 @@
     "C:\\Users\\Usuario\\.nuget\\packages\\system.security.cryptography.pkcs\\8.0.0\\system.security.cryptography.pkcs.8.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\system.security.cryptography.protecteddata\\8.0.0\\system.security.cryptography.protecteddata.8.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\system.security.permissions\\8.0.0\\system.security.permissions.8.0.0.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\system.windows.extensions\\8.0.0\\system.windows.extensions.8.0.0.nupkg.sha512"
+    "C:\\Users\\Usuario\\.nuget\\packages\\system.windows.extensions\\8.0.0\\system.windows.extensions.8.0.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\10.0.0\\microsoft.netcore.app.runtime.win-x64.10.0.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\10.0.0\\microsoft.windowsdesktop.app.runtime.win-x64.10.0.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\10.0.0\\microsoft.aspnetcore.app.runtime.win-x64.10.0.0.nupkg.sha512"
   ],
   "logs": [
     {

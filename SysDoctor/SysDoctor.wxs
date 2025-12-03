@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="SysDoctor - Reparador e Otimizador de Windows" 
+           Language="1033" 
+           Version="1.0.0.0" 
+           Manufacturer="SysDoctor Team" 
+           UpgradeCode="12345678-1234-1234-1234-123456789012"
+           InstallerVersion="500"
+           Compressed="yes">
+    
+    <SummaryInformation Keywords="SysDoctor, Sistema, Otimizacao, Windows, Administrador" 
+                        Description="SysDoctor - Otimizador e Reparador de Sistema Windows (Requer Administrador)" />
+    
+    <MajorUpgrade DowngradeErrorMessage="Uma versão mais nova do SysDoctor já está instalada." />
+    
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="SysDoctor" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="SysDoctor" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="SysDoctor"/>
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="SysDoctorExe">
+        <File Source="bin\Release\net10.0\win-x64\publish\SysDoctor.exe" />
+      </Component>
+      
+      <Component Id="ApplicationShortcuts" Directory="ApplicationProgramsFolder">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="SysDoctor (Executar como Administrador)"
+                  Target="[INSTALLFOLDER]SysDoctor.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKLM" Key="Software\SysDoctor" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+      
+      <Component Id="DesktopShortcut" Directory="DesktopFolder">
+        <Shortcut Id="ApplicationDesktopShortcut"
+                  Name="SysDoctor (Executar como Administrador)"
+                  Target="[INSTALLFOLDER]SysDoctor.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKLM" Key="Software\SysDoctor" Name="desktop" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Package>
+</Wix>
