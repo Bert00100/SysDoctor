@@ -35,4 +35,8 @@
     <None Include="Logo\Sysdoctor.png" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
 </Project>

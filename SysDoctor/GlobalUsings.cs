@@ -15,3 +15,5 @@ global using System.Threading.Tasks;
 global using CommandLine;
 global using Spectre.Console;
 global using SysDoctor.Scripts;
+global using System.Net.Http;
+global using System.Threading.Tasks;

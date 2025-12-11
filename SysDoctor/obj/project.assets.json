@@ -89,12 +89,6 @@
           }
         }
       },
-      "Microsoft.NET.ILLink.Tasks/10.0.0": {
-        "type": "package",
-        "build": {
-          "build/Microsoft.NET.ILLink.Tasks.props": {}
-        }
-      },
       "Microsoft.PowerShell.CoreCLR.Eventing/7.4.0": {
         "type": "package",
         "dependencies": {
@@ -590,12 +584,6 @@
           "runtimes/win-x64/native/microsoft.management.infrastructure.native.unmanaged.dll": {}
         }
       },
-      "Microsoft.NET.ILLink.Tasks/10.0.0": {
-        "type": "package",
-        "build": {
-          "build/Microsoft.NET.ILLink.Tasks.props": {}
-        }
-      },
       "Microsoft.PowerShell.CoreCLR.Eventing/7.4.0": {
         "type": "package",
         "dependencies": {
@@ -1016,56 +1004,6 @@
         "runtimes/win-x86/lib/netstandard1.6/microsoft.management.infrastructure.dll",
         "runtimes/win-x86/lib/netstandard1.6/microsoft.management.infrastructure.native.dll",
         "runtimes/win-x86/native/microsoft.management.infrastructure.native.unmanaged.dll"
-      ]
-    },
-    "Microsoft.NET.ILLink.Tasks/10.0.0": {
-      "sha512": "kICGrGYEzCNI3wPzfEXcwNHgTvlvVn9yJDhSdRK+oZQy4jvYH529u7O0xf5ocQKzOMjfS07+3z9PKRIjrFMJDA==",
-      "type": "package",
-      "path": "microsoft.net.illink.tasks/10.0.0",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "Sdk/Sdk.props",
-        "THIRD-PARTY-NOTICES.TXT",
-        "analyzers/dotnet/cs/ILLink.CodeFixProvider.dll",
-        "analyzers/dotnet/cs/ILLink.RoslynAnalyzer.dll",
-        "build/Microsoft.NET.ILLink.Analyzers.props",
-        "build/Microsoft.NET.ILLink.Tasks.props",
-        "build/Microsoft.NET.ILLink.targets",
-        "microsoft.net.illink.tasks.10.0.0.nupkg.sha512",
-        "microsoft.net.illink.tasks.nuspec",
-        "tools/net/ILLink.Tasks.deps.json",
-        "tools/net/ILLink.Tasks.dll",
-        "tools/net/Mono.Cecil.Mdb.dll",
-        "tools/net/Mono.Cecil.Pdb.dll",
-        "tools/net/Mono.Cecil.Rocks.dll",
-        "tools/net/Mono.Cecil.dll",
-        "tools/net/Sdk/Sdk.props",
-        "tools/net/build/Microsoft.NET.ILLink.Analyzers.props",
-        "tools/net/build/Microsoft.NET.ILLink.Tasks.props",
-        "tools/net/build/Microsoft.NET.ILLink.targets",
-        "tools/net/illink.deps.json",
-        "tools/net/illink.dll",
-        "tools/net/illink.runtimeconfig.json",
-        "tools/netframework/ILLink.Tasks.dll",
-        "tools/netframework/ILLink.Tasks.dll.config",
-        "tools/netframework/Mono.Cecil.Mdb.dll",
-        "tools/netframework/Mono.Cecil.Pdb.dll",
-        "tools/netframework/Mono.Cecil.Rocks.dll",
-        "tools/netframework/Mono.Cecil.dll",
-        "tools/netframework/Sdk/Sdk.props",
-        "tools/netframework/System.Buffers.dll",
-        "tools/netframework/System.Collections.Immutable.dll",
-        "tools/netframework/System.Memory.dll",
-        "tools/netframework/System.Numerics.Vectors.dll",
-        "tools/netframework/System.Reflection.Metadata.dll",
-        "tools/netframework/System.Runtime.CompilerServices.Unsafe.dll",
-        "tools/netframework/build/Microsoft.NET.ILLink.Analyzers.props",
-        "tools/netframework/build/Microsoft.NET.ILLink.Tasks.props",
-        "tools/netframework/build/Microsoft.NET.ILLink.targets",
-        "useSharedDesignerContext.txt"
       ]
     },
     "Microsoft.PowerShell.CoreCLR.Eventing/7.4.0": {
@@ -1663,7 +1601,6 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "CommandLineParser >= 2.9.1",
-      "Microsoft.NET.ILLink.Tasks >= 10.0.0",
       "Microsoft.Win32.Registry >= 5.0.0",
       "Serilog >= 3.1.1",
       "Serilog.Sinks.Console >= 5.0.1",
@@ -1674,24 +1611,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Usuario\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Usuario\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
+      "projectUniqueName": "C:\\Users\\Usuario\\Documents\\SysDoctor\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
       "projectName": "SysDoctor",
-      "projectPath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
+      "projectPath": "C:\\Users\\Usuario\\Documents\\SysDoctor\\SysDoctor\\SysDoctor\\SysDoctor.csproj",
       "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Usuario\\Documents\\Python\\SysDoctor\\SysDoctor\\obj\\",
+      "outputPath": "C:\\Users\\Usuario\\Documents\\SysDoctor\\SysDoctor\\SysDoctor\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
         "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1699,7 +1631,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1727,12 +1658,6 @@
           "CommandLineParser": {
             "target": "Package",
             "version": "[2.9.1, )"
-          },
-          "Microsoft.NET.ILLink.Tasks": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[10.0.0, )",
-            "autoReferenced": true
           },
           "Microsoft.Win32.Registry": {
             "target": "Package",
@@ -1777,15 +1702,15 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-            "version": "[10.0.0, 10.0.0]"
+            "version": "[10.0.1, 10.0.1]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x64",
-            "version": "[10.0.0, 10.0.0]"
+            "version": "[10.0.1, 10.0.1]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-            "version": "[10.0.0, 10.0.0]"
+            "version": "[10.0.1, 10.0.1]"
           }
         ],
         "frameworkReferences": {
@@ -1793,7 +1718,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -2081,7 +2006,7 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.Win32.Registry will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "message": "PackageReference Microsoft.Win32.Registry não será podado. Considere remover este pacote das dependências, pois ele provavelmente é desnecessário.",
       "libraryId": "Microsoft.Win32.Registry",
       "targetGraphs": [
         "net10.0"
