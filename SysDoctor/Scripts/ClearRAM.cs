@@ -120,7 +120,10 @@ namespace SysDoctor.Scripts
                             // Liberar Working Sets
                             task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets...[/]";
                             var emptyWorking = ExecutarProcesso(rammapPath, "-Ew", 30);
-                            if (emptyWorking.exitCode != 0 || !string.IsNullOrEmpty(emptyWorking.error))
+
+                            // RAMMap retorna exit code diferente de 0, mas ainda funciona
+                            // Então verificamos apenas se o programa realmente falhou
+                            if (emptyWorking.exitCode == -1) // Timeout ou erro crítico
                             {
                                 erros.Add("Empty Working Sets");
                                 DebugWarning("Aviso ao liberar Working Sets");
@@ -133,7 +136,8 @@ namespace SysDoctor.Scripts
                             // Liberar Standby List
                             task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Standby List...[/]";
                             var emptyStandby = ExecutarProcesso(rammapPath, "-Et", 30);
-                            if (emptyStandby.exitCode != 0 || !string.IsNullOrEmpty(emptyStandby.error))
+
+                            if (emptyStandby.exitCode == -1) // Timeout ou erro crítico
                             {
                                 erros.Add("Empty Standby List");
                                 DebugWarning("Aviso ao liberar Standby List");
@@ -301,6 +305,9 @@ namespace SysDoctor.Scripts
 
                     string output = outputTask.Result;
                     string error = errorTask.Result;
+            
+                    // LOG DETALHADO
+                    LogDetalhesProcesso(fileName, arguments, process.ExitCode, output, error);
 
                     return (process.ExitCode, output, error);
                 }
@@ -308,6 +315,22 @@ namespace SysDoctor.Scripts
             catch (Exception ex)
             {
                 return (-1, "", ex.Message);
+            }
+        }
+
+        private static void LogDetalhesProcesso(string fileName, string arguments, int exitCode, string output, string error)
+        {
+            AnsiConsole.MarkupLine($"[dim]📋 Comando: {Path.GetFileName(fileName)} {arguments}[/]");
+            AnsiConsole.MarkupLine($"[dim]📊 Exit Code: {exitCode}[/]");
+            
+            if (!string.IsNullOrWhiteSpace(output))
+            {
+                AnsiConsole.MarkupLine($"[dim]📤 Output: {output}[/]");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                AnsiConsole.MarkupLine($"[red]📥 Erro: {error}[/]");
             }
         }
 
