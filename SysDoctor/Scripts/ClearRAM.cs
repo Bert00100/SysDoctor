@@ -37,14 +37,18 @@ namespace SysDoctor.Scripts
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Limpando pasta TEMP do Usuário...[/]";
                         task.Value = passoAtual;
                         var clerarTempUser = ExecutarPowerShellAsync("Remove-Item -Path \"$env:TEMP\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60).Result;
-                        if (clerarTempUser.exitCode == 0)
+                        if (clerarTempUser.exitCode == 0 && string.IsNullOrEmpty(clerarTempUser.error))
                         {
                             DebugSuccess("TEMP do Usuário limpo");
                         }
-                        else
+                        else if (!string.IsNullOrEmpty(clerarTempUser.error))
                         {
                             DebugWarning("Aviso ao limpar pasta TEMP do Usuário");
-                            if (!string.IsNullOrEmpty(clerarTempUser.error)) erros.Add("TEMP Usuário");
+                            erros.Add("TEMP Usuário");
+                        }
+                        else
+                        {
+                            DebugSuccess("TEMP do Usuário limpo");
                         }
 
                         // Passo 2: Limpando pasta TEMP do Sistema
@@ -52,14 +56,18 @@ namespace SysDoctor.Scripts
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Limpando pasta TEMP do Sistema...[/]";
                         task.Value = passoAtual;
                         var clerarTempSystem = ExecutarPowerShellAsync("Remove-Item -Path \"$env:windir\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60).Result;
-                        if (clerarTempSystem.exitCode == 0)
+                        if (clerarTempSystem.exitCode == 0 && string.IsNullOrEmpty(clerarTempSystem.error))
                         {
                             DebugSuccess("TEMP do Sistema limpo");
                         }
-                        else
+                        else if (!string.IsNullOrEmpty(clerarTempSystem.error))
                         {
                             DebugWarning("Aviso ao limpar pasta TEMP do Sistema");
-                            if (!string.IsNullOrEmpty(clerarTempSystem.error)) erros.Add("TEMP Sistema");
+                            erros.Add("TEMP Sistema");
+                        }
+                        else
+                        {
+                            DebugSuccess("TEMP do Sistema limpo");
                         }
 
                         // Passo 3: Limpando Cache do Sistema
@@ -115,37 +123,25 @@ namespace SysDoctor.Scripts
                         }
                         else
                         {
-                            DebugSuccess($"RAMMap encontrado");
-                            
-                            // Liberar Working Sets
-                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets...[/]";
-                            var emptyWorking = ExecutarProcesso(rammapPath, "-Ew", 30);
+                            DebugSuccess("RAMMap encontrado");
 
-                            // RAMMap retorna exit code diferente de 0, mas ainda funciona
-                            // Então verificamos apenas se o programa realmente falhou
-                            if (emptyWorking.exitCode == -1) // Timeout ou erro crítico
+                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets e Standby List...[/]";
+
+                            var resultado = ExecutarProcesso(
+                                rammapPath,
+                                "-accepteula -Ew -Et",
+                                30
+                            );
+
+                            if (resultado.exitCode != 0 || !string.IsNullOrEmpty(resultado.error))
                             {
-                                erros.Add("Empty Working Sets");
-                                DebugWarning("Aviso ao liberar Working Sets");
+                                erros.Add("RAMMap");
+                                DebugWarning("Aviso ao liberar memória com RAMMap");
                             }
                             else
                             {
-                                DebugSuccess("Working Sets liberados");
-                            }
-                            
-                            // Liberar Standby List
-                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Standby List...[/]";
-                            var emptyStandby = ExecutarProcesso(rammapPath, "-Et", 30);
-
-                            if (emptyStandby.exitCode == -1) // Timeout ou erro crítico
-                            {
-                                erros.Add("Empty Standby List");
-                                DebugWarning("Aviso ao liberar Standby List");
-                            }
-                            else
-                            {
-                                DebugSuccess("Standby List liberada");
-                            }
+                                DebugSuccess("Working Sets e Standby List liberados");
+    }
                         }
                         
                         task.StopTask();

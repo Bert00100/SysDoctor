@@ -5,6 +5,7 @@
 Scripts/ISOs/*.iso
 
 # Visual Studio / .NET
+# Build artifacts
 bin/
 obj/
 *.user
