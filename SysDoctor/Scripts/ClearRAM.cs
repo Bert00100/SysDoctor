@@ -2,7 +2,7 @@ namespace SysDoctor.Scripts
 {
     public class ClearRAM
     {
-        public static void Executar()
+        public static async Task Executar() // Alterado para async Task
         {
             AnsiConsole.MarkupLine("[blue]Limpando Memoria RAM[/]");
             AnsiConsole.MarkupLine("[yellow]As ações a seguir podem levar algum tempo...[/]");
@@ -19,7 +19,7 @@ namespace SysDoctor.Scripts
                 // Captura memória antes da limpeza
                 var memoriaAntes = ObterMemoriaRAM();
 
-                AnsiConsole.Progress()
+                await AnsiConsole.Progress() // Adicionado await
                     .AutoClear(false)
                     .Columns(new ProgressColumn[]
                     {
@@ -28,7 +28,7 @@ namespace SysDoctor.Scripts
                         new PercentageColumn(),
                         new ElapsedTimeColumn(),
                     })
-                    .Start(ctx =>
+                    .StartAsync(async ctx => // Alterado para StartAsync
                     {
                         var task = ctx.AddTask("[cyan]Limpando Memória RAM...[/]", maxValue: totalPassos);
 
@@ -36,7 +36,7 @@ namespace SysDoctor.Scripts
                         passoAtual++;
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Limpando pasta TEMP do Usuário...[/]";
                         task.Value = passoAtual;
-                        var clerarTempUser = ExecutarPowerShellAsync("Remove-Item -Path \"$env:TEMP\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60).Result;
+                        var clerarTempUser = await ExecutarPowerShellAsync("Remove-Item -Path \"$env:TEMP\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60); // Removido .Result
                         if (clerarTempUser.exitCode == 0 && string.IsNullOrEmpty(clerarTempUser.error))
                         {
                             DebugSuccess("TEMP do Usuário limpo");
@@ -55,7 +55,7 @@ namespace SysDoctor.Scripts
                         passoAtual++;
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Limpando pasta TEMP do Sistema...[/]";
                         task.Value = passoAtual;
-                        var clerarTempSystem = ExecutarPowerShellAsync("Remove-Item -Path \"$env:windir\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60).Result;
+                        var clerarTempSystem = await ExecutarPowerShellAsync("Remove-Item -Path \"$env:windir\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue", 60); // Removido .Result
                         if (clerarTempSystem.exitCode == 0 && string.IsNullOrEmpty(clerarTempSystem.error))
                         {
                             DebugSuccess("TEMP do Sistema limpo");
@@ -74,7 +74,7 @@ namespace SysDoctor.Scripts
                         passoAtual++;
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Limpando Cache do Sistema...[/]";
                         task.Value = passoAtual;
-                        var clearSystemCache = ExecutarPowerShellAsync("[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); [System.GC]::Collect();", 30).Result;
+                        var clearSystemCache = await ExecutarPowerShellAsync("[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); [System.GC]::Collect();", 30); // Removido .Result
                         if (clearSystemCache.exitCode == 0)
                         {
                             DebugSuccess("Cache do Sistema limpo");
@@ -89,7 +89,7 @@ namespace SysDoctor.Scripts
                         passoAtual++;
                         task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Esvaziando Lixeira...[/]";
                         task.Value = passoAtual; 
-                        var clearEmpty = ExecutarPowerShellAsync("Clear-RecycleBin -Force -ErrorAction SilentlyContinue", 30).Result;
+                        var clearEmpty = await ExecutarPowerShellAsync("Clear-RecycleBin -Force -ErrorAction SilentlyContinue", 30); // Removido .Result
                         if (clearEmpty.exitCode == 0)
                         {
                             DebugSuccess("Lixeira esvaziada");
@@ -120,50 +120,65 @@ namespace SysDoctor.Scripts
                         {
                             DebugError($"RAMMap não encontrado em: {rammapPath}");
                             erros.Add("RAMMap não encontrado");
+                            task.StopTask();
                         }
                         else
                         {
                             DebugSuccess("RAMMap encontrado");
 
-                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets...[/]";
+                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Abrindo RAMMap para limpeza manual...[/]";
 
-                            var emptyWorking = ExecutarProcesso(
-                                rammapPath,
-                                "-Ew",
-                                30
-                            );
-
-                            if (emptyWorking.exitCode != 0)
+                            try
                             {
-                                erros.Add("Empty Working Sets");
-                                DebugWarning("Aviso ao liberar Working Sets");
+                                // Fechar a barra de progresso antes de abrir o RAMMap
+                                task.StopTask();
+                                
+                                // Aguardar um pouco para garantir que a interface seja atualizada
+                                await Task.Delay(500);
+                                
+                                AnsiConsole.Clear();
+                                AnsiConsole.MarkupLine("[yellow]⚠️ ATENÇÃO: RAMMAP ABERTO[/]");
+                                AnsiConsole.MarkupLine("[cyan]No RAMMap, clique em:[/]");
+                                AnsiConsole.MarkupLine("[green]1. Empty ➜ Empty Working Sets[/]");
+                                AnsiConsole.MarkupLine("[green]2. Empty ➜ Empty Standby List[/]");
+                                AnsiConsole.MarkupLine("\n[cyan]Após concluir, feche o RAMMap para continuar...[/]");
+                                AnsiConsole.WriteLine();
+                                
+                                var rammapProcess = new Process
+                                {
+                                    StartInfo = new ProcessStartInfo
+                                    {
+                                        FileName = rammapPath,
+                                        Arguments = "-accepteula",
+                                        UseShellExecute = true,
+                                        Verb = "runas" // garante admin
+                                    }
+                                };
+
+                                // Iniciar o processo do RAMMap
+                                rammapProcess.Start();
+                                DebugSuccess("RAMMap aberto com sucesso - Aguardando seu fechamento...");
+                                
+                                // Aguardar o usuário fechar o RAMMap
+                                await Task.Run(() => rammapProcess.WaitForExit());
+                                
+                                DebugSuccess("RAMMap fechado pelo usuário");
+                                AnsiConsole.WriteLine();
+                                
+                                // Limpar a tela e voltar para o contexto do progresso
+                                AnsiConsole.Clear();
+                                
+                                // Reabrir o contexto de progresso para completar a tarefa
+                                var task2 = ctx.AddTask("[cyan]Finalizando limpeza...[/]", maxValue: 1);
+                                task2.Increment(1);
+                                task2.StopTask();
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                DebugSuccess("Working Sets liberados");
+                                erros.Add("RAMMap");
+                                DebugWarning($"Falha ao abrir/executar o RAMMap: {ex.Message}");
                             }
-
-                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Standby List...[/]";
-
-                            var emptyStandby = ExecutarProcesso(
-                                rammapPath,
-                                "-Et",
-                                30
-                            );
-
-                            if (emptyStandby.exitCode != 0)
-                            {
-                                erros.Add("Empty Standby List");
-                                DebugWarning("Aviso ao liberar Standby List");
-                            }
-                            else
-                            {
-                                DebugSuccess("Standby List liberada");
-                            }
-
                         }
-                        
-                        task.StopTask();
                     });
 
                 stopwatch.Stop();
@@ -186,10 +201,17 @@ namespace SysDoctor.Scripts
                 {
                     AnsiConsole.MarkupLine("[green]✅ Memória RAM Limpa com Sucesso![/]");
                 }
+
+                // Aguardar ENTER do usuário
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[cyan]Pressione ENTER para continuar...[/]");
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine($"[red]💥 Erro durante a limpeza: {ex.Message}[/]");
+                AnsiConsole.MarkupLine("[cyan]Pressione ENTER para continuar...[/]");
+                Console.ReadLine();
             }
         }
 
