@@ -125,23 +125,42 @@ namespace SysDoctor.Scripts
                         {
                             DebugSuccess("RAMMap encontrado");
 
-                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets e Standby List...[/]";
+                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Working Sets...[/]";
 
-                            var resultado = ExecutarProcesso(
+                            var emptyWorking = ExecutarProcesso(
                                 rammapPath,
-                                "-accepteula -Ew -Et",
+                                "-Ew",
                                 30
                             );
 
-                            if (resultado.exitCode != 0 || !string.IsNullOrEmpty(resultado.error))
+                            if (emptyWorking.exitCode != 0)
                             {
-                                erros.Add("RAMMap");
-                                DebugWarning("Aviso ao liberar memória com RAMMap");
+                                erros.Add("Empty Working Sets");
+                                DebugWarning("Aviso ao liberar Working Sets");
                             }
                             else
                             {
-                                DebugSuccess("Working Sets e Standby List liberados");
-    }
+                                DebugSuccess("Working Sets liberados");
+                            }
+
+                            task.Description = $"[cyan]Passo {passoAtual}/{totalPassos}: Liberando Standby List...[/]";
+
+                            var emptyStandby = ExecutarProcesso(
+                                rammapPath,
+                                "-Et",
+                                30
+                            );
+
+                            if (emptyStandby.exitCode != 0)
+                            {
+                                erros.Add("Empty Standby List");
+                                DebugWarning("Aviso ao liberar Standby List");
+                            }
+                            else
+                            {
+                                DebugSuccess("Standby List liberada");
+                            }
+
                         }
                         
                         task.StopTask();
