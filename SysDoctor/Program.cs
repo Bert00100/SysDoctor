@@ -28,15 +28,15 @@ namespace SysDoctor
             }
 
             // PASSO 2: Após email validado, mostrar o app
-            AnsiConsole.Clear(); // Limpar a tela
+            AnsiConsole.Clear();
             MostrarAsciiArt();
             MostrarStatusAdministrador();
             
             // PASSO 3: Loop do menu principal
-            MenuPrincipal();
+            await MenuPrincipalAsync();
         }
 
-        private static void MenuPrincipal()
+        private static async Task MenuPrincipalAsync()
         {
             bool sair = false;
 
@@ -52,75 +52,75 @@ namespace SysDoctor
                 switch (opcao)
                 {
                     case "1":
-                        ExecutarComTratamento(() => InfoMachine.Executar(), "Informação da Máquina");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => InfoMachine.Executar()), "Informação da Máquina");
                         break;
 
                     case "2":
-                        ExecutarComTratamento(() => ClearDisk.Executar(), "Limpar SSD/HD");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => ClearDisk.Executar()), "Limpar SSD/HD");
                         break;
 
                     case "3":
-                        ExecutarComTratamento(() => ScanWindow.Executar(), "Scanner do Windows");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => ScanWindow.Executar()), "Scanner do Windows");
                         break;
 
                     case "4":
-                        ExecutarComTratamento(() => ClearRAM.Executar(), "Limpar Memória RAM");
+                        await ExecutarComTratamentoAsync(() => ClearRAM.Executar(), "Limpar Memória RAM");
                         break;
 
                     case "5":
-                        ExecutarComTratamento(() => SpeedTest.Executar(), "SpeedTest");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => SpeedTest.Executar()), "SpeedTest");
                         break;
 
                     case "6":
-                        ExecutarComTratamento(() => ClearEthernet.Executar(), "Limpar Caches de Wifi/Ethernet");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => ClearEthernet.Executar()), "Limpar Caches de Wifi/Ethernet");
                         break;
 
                     case "7":
-                        ExecutarComTratamentoAsync(() => TestPing.Executar(), "Teste de Ping");
+                        await ExecutarComTratamentoAsync(() => TestPing.Executar(), "Teste de Ping");
                         break;
 
                     case "8":
-                        ExecutarComTratamento(() => OtmPing.Executar(), "Otimizar Ping");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => OtmPing.Executar()), "Otimizar Ping");
                         break;
 
                     case "9":
-                        ExecutarComTratamento(() => OtmWifi.Executar(), "Otimizar Wifi");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => OtmWifi.Executar()), "Otimizar Wifi");
                         break;
 
                     case "10":
-                        ExecutarComTratamento(() => MapNet.Executar(), "Mapa de Conexão");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => MapNet.Executar()), "Mapa de Conexão");
                         break;
 
                     case "11":
-                        ExecutarComTratamento(() => checkTemperature.Executar(), "Verificar Temperatura");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => checkTemperature.Executar()), "Verificar Temperatura");
                         break;
 
                     case "12":
-                        ExecutarComTratamento(() => OtmWindows.Executar(), "Otimizar Windows");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => OtmWindows.Executar()), "Otimizar Windows");
                         break;
 
                     case "13":
-                        ExecutarComTratamento(() => PointReset.Executar(), "Criar Ponto de Restauração");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => PointReset.Executar()), "Criar Ponto de Restauração");
                         break;
 
                     case "14":
-                        ExecutarComTratamento(() => ConfigPosInstall.Executar(), "Configuração Pós-Instalação");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => ConfigPosInstall.Executar()), "Configuração Pós-Instalação");
                         break;
 
                     case "15":
-                        ExecutarComTratamento(() => UpdateWindows.Executar(), "Atualizar Windows");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => UpdateWindows.Executar()), "Atualizar Windows");
                         break;
 
                     case "16":
-                        ExecutarComTratamento(() => RunDefender.Executar(), "Rodar Windows Defender");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => RunDefender.Executar()), "Rodar Windows Defender");
                         break;
 
                     case "17":
-                        ExecutarComTratamento(() => PackPrograms.Executar(), "Pack de programas");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => PackPrograms.Executar()), "Pack de programas");
                         break;
 
                     case "18":
-                        ExecutarComTratamento(() => IsoWin.Executar(), "ISO Windows 11 Pro");
+                        await ExecutarComTratamentoAsync(() => Task.Run(() => IsoWin.Executar()), "ISO Windows 11 Pro");
                         break;
 
                     case "0":
@@ -135,6 +135,7 @@ namespace SysDoctor
 
                 if (!sair)
                 {
+                    AnsiConsole.WriteLine();
                     AnsiConsole.MarkupLine("[dim]Pressione ENTER para continuar...[/]");
                     Console.ReadLine();
                     AnsiConsole.Clear();
@@ -353,40 +354,17 @@ namespace SysDoctor
             Console.WriteLine();
         }
 
-        private static void ExecutarComTratamento(Action acao, string nomeFuncionalidade)
+        private static async Task ExecutarComTratamentoAsync(Func<Task> acao, string nomeFuncionalidade)
         {
             try
             {
-                acao.Invoke();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
-                AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
-                AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
-                AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.MarkupLine("[red]❌ ERRO ao executar " + nomeFuncionalidade + "[/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]Erro: " + ex.Message + "[/]");
-            }
-        }
-
-        private static void ExecutarComTratamentoAsync(Func<Task> acao, string nomeFuncionalidade)
-        {
-            try
-            {
-                acao.Invoke().Wait();
+                await acao.Invoke();
             }
             catch (AggregateException aex) when (aex.InnerException is UnauthorizedAccessException)
             {
                 AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
                 AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
+                AnsiConsole.MarkupLine($"[yellow]⚠️  A funcionalidade '[yellow]{nomeFuncionalidade}[/]' requer privilégios de administrador![/]");
                 AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
                 AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
                 AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
@@ -395,16 +373,16 @@ namespace SysDoctor
             {
                 AnsiConsole.MarkupLine("[red]❌ ACESSO NEGADO[/]");
                 AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]⚠️  A funcionalidade '[yellow]" + nomeFuncionalidade + "[/]' requer privilégios de administrador![/]");
+                AnsiConsole.MarkupLine($"[yellow]⚠️  A funcionalidade '[yellow]{nomeFuncionalidade}[/]' requer privilégios de administrador![/]");
                 AnsiConsole.MarkupLine("[cyan]💡 Para usar esta funcionalidade:[/]");
                 AnsiConsole.MarkupLine("[white]1. Execute o programa como administrador[/]");
                 AnsiConsole.MarkupLine("[white]2. Ou tente novamente com privilégios elevados[/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine("[red]❌ ERRO ao executar " + nomeFuncionalidade + "[/]");
+                AnsiConsole.MarkupLine($"[red]❌ ERRO ao executar {nomeFuncionalidade}[/]");
                 AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[yellow]Erro: " + ex.Message + "[/]");
+                AnsiConsole.MarkupLine($"[yellow]Erro: {ex.Message}[/]");
             }
         }
     }
