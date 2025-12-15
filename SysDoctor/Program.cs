@@ -232,28 +232,28 @@ namespace SysDoctor
         {
             var opcoesEsq = new[]
             {
-                "[[ 1 ]] Informação da Máquina",
-                "[[ 3 ]] Scanner do Windows", 
-                "[[ 5 ]] SpeedTest",
-                "[[ 7 ]] Teste de Ping",
-                "[[ 9 ]] Otimizar Wifi",
-                "[[ 11 ]] Verificar Temperatura",
-                "[[ 13 ]] Criar Ponto de Restauração",
-                "[[ 15 ]] Atualizar Windows",
-                "[[ 17 ]] Pack de programas"
+                "[ 1 ] Informações do Computador",
+                "[ 3 ] Verificar Sistema do Windows",
+                "[ 5 ] Testar Velocidade da Internet",
+                "[ 7 ] Testar Conexão (Ping)",
+                "[ 9 ] Melhorar Conexão Wi-Fi",
+                "[ 11 ] Ver Temperatura do Computador",
+                "[ 13 ] Criar Ponto de Segurança",
+                "[ 15 ] Atualizar o Windows",
+                "[ 17 ] Instalar Programas Essenciais"
             };
 
             var opcoesDir = new[]
             {
-                "[[ 2 ]] Limpar SSD/HD",
-                "[[ 4 ]] Limpar Memória RAM",
-                "[[ 6 ]] Limpar Caches de Wifi/Ethernet", 
-                "[[ 8 ]] Otimizar Ping ",
-                "[[ 10 ]] Mapa de Conexão",
-                "[[ 12 ]] Otimizar Windows",
-                "[[ 14 ]] Configuração Pós-Instalação",
-                "[[ 16 ]] Rodar Windows Defender",
-                "[[ 18 ]] ISO Windows 11 Pro otm"
+                "[ 2 ] Limpar Disco (SSD / HD)",
+                "[ 4 ] Liberar Memória RAM",
+                "[ 6 ] Corrigir Problemas de Internet",
+                "[ 8 ] Melhorar Latência (Ping)",
+                "[ 10 ] Ver Mapa da Rede",
+                "[ 12 ] Otimizar Desempenho do Windows",
+                "[ 14 ] Configurar Windows Pós-Instalação",
+                "[ 16 ] Verificar Vírus (Defender)",
+                "[ 18 ] Baixar Windows 11 Otimizado"
             };
 
             var table = new Table()

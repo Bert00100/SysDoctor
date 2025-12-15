@@ -49,24 +49,24 @@ namespace SysDoctor.Scripts
 
             string[] opcoesEsq = new string[]
             {
-                "[[ 1 ]] Otimizar Energia",
-                "[[ 3 ]] Otimizar ALT+TAB",
-                "[[ 5 ]] Desativar Serviços Inúteis",
-                "[[ 7 ]] Desativar Overlays",
-                "[[ 9 ]] Desativar Hibernação",
-                "[[ 11 ]] Desativar Hyper-V",
-                "[[ 13 ]] Desativar Download Maps Manager",
+                "[ 1 ] Melhorar Desempenho de Energia",
+                "[ 3 ] Tornar ALT+TAB Mais Rápido",
+                "[ 5 ] Desligar Serviços que Deixam o PC Lento",
+                "[ 7 ] Desligar Overlays em Jogos",
+                "[ 9 ] Desligar Hibernação",
+                "[ 11 ] Desligar Recursos de Virtualização",
+                "[ 13 ] Desligar Downloads em Segundo Plano"
             };
 
             string[] opcoesDir = new string[]
             {
-                "[[ 2 ]] Desativar Efeitos Visuais",
-                "[[ 4 ]] Desativar Telemetria",
-                "[[ 6 ]] Debloater",
-                "[[ 8 ]] Desativar UAC",
-                "[[ 10 ]] Desativar Indexação de Arquivos",
-                "[[ 12 ]] Desativar Aero Peek",
-                "[[ 14 ]] Desativar SmartScreen",
+                "[ 2 ] Melhorar Aparência e Desempenho",
+                "[ 4 ] Reduzir Coleta de Dados do Windows",
+                "[ 6 ] Remover Apps Desnecessários",
+                "[ 8 ] Reduzir Avisos de Segurança",
+                "[ 10 ] Acelerar Pesquisa de Arquivos",
+                "[ 12 ] Desligar Efeitos Visuais Extras",
+                "[ 14 ] Reduzir Alertas do SmartScreen"
             };
 
             var table = new Table()
