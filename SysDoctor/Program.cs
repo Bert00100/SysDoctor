@@ -1,4 +1,4 @@
-﻿using SysDoctor.Scripts;
+using SysDoctor.Scripts;
 using Spectre.Console;
 using System.Security.Principal;
 using System.Runtime.InteropServices;
@@ -230,30 +230,31 @@ namespace SysDoctor
 
         private static void MostrarMenu()
         {
+            // CORREÇÃO: Escapar os colchetes com [[ e ]]
             var opcoesEsq = new[]
             {
-                "[ 1 ] Informações do Computador",
-                "[ 3 ] Verificar Sistema do Windows",
-                "[ 5 ] Testar Velocidade da Internet",
-                "[ 7 ] Testar Conexão (Ping)",
-                "[ 9 ] Melhorar Conexão Wi-Fi",
-                "[ 11 ] Ver Temperatura do Computador",
-                "[ 13 ] Criar Ponto de Segurança",
-                "[ 15 ] Atualizar o Windows",
-                "[ 17 ] Instalar Programas Essenciais"
+                "[[ 1 ]] Informações do Computador",
+                "[[ 3 ]] Verificar Sistema do Windows",
+                "[[ 5 ]] Testar Velocidade da Internet",
+                "[[ 7 ]] Testar Conexão (Ping)",
+                "[[ 9 ]] Melhorar Conexão Wi-Fi",
+                "[[ 11 ]] Ver Temperatura do Computador",
+                "[[ 13 ]] Criar Ponto de Segurança",
+                "[[ 15 ]] Atualizar o Windows",
+                "[[ 17 ]] Instalar Programas Essenciais"
             };
 
             var opcoesDir = new[]
             {
-                "[ 2 ] Limpar Disco (SSD / HD)",
-                "[ 4 ] Liberar Memória RAM",
-                "[ 6 ] Corrigir Problemas de Internet",
-                "[ 8 ] Melhorar Latência (Ping)",
-                "[ 10 ] Ver Mapa da Rede",
-                "[ 12 ] Otimizar Desempenho do Windows",
-                "[ 14 ] Configurar Windows Pós-Instalação",
-                "[ 16 ] Verificar Vírus (Defender)",
-                "[ 18 ] Baixar Windows 11 Otimizado"
+                "[[ 2 ]] Limpar Disco (SSD / HD)",
+                "[[ 4 ]] Liberar Memória RAM",
+                "[[ 6 ]] Corrigir Problemas de Internet",
+                "[[ 8 ]] Melhorar Latência (Ping)",
+                "[[ 10 ]] Ver Mapa da Rede",
+                "[[ 12 ]] Desempenho do Windows",
+                "[[ 14 ]] Configurar Windows",
+                "[[ 16 ]] Verificar Vírus (Defender)",
+                "[[ 18 ]] Baixar Windows 11 Otimizado"
             };
 
             var table = new Table()
@@ -289,7 +290,8 @@ namespace SysDoctor
 
         private static void CentralizarTexto(string texto, bool usarMarkup)
         {
-            var textoLimpo = System.Text.RegularExpressions.Regex.Replace(texto, @"\[.*?\]", "");
+            // Remove tags de markup para calcular o tamanho real do texto
+            var textoLimpo = System.Text.RegularExpressions.Regex.Replace(texto, @"\[\[|\]\]|\[.*?\]", "");
     
             int larguraTerminal = Console.WindowWidth;
             int padding = Math.Max(0, (larguraTerminal - textoLimpo.Length) / 2);
@@ -300,7 +302,7 @@ namespace SysDoctor
             }
             else
             {
-                var textoSemTags = System.Text.RegularExpressions.Regex.Replace(texto, @"\[.*?\]", "");
+                var textoSemTags = System.Text.RegularExpressions.Regex.Replace(texto, @"\[\[|\]\]|\[.*?\]", "");
                 Console.WriteLine(new string(' ', padding) + textoSemTags);
             }
         }
