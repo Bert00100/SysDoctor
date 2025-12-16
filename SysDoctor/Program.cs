@@ -241,7 +241,7 @@ namespace SysDoctor
                 "[[ 11 ]] Ver Temperatura do Computador",
                 "[[ 13 ]] Criar Ponto de Segurança",
                 "[[ 15 ]] Atualizar o Windows",
-                "[[ 17 ]] Instalar Programas Essenciais"
+                "[[ 17 ]] Pack de Programas"
             };
 
             var opcoesDir = new[]
