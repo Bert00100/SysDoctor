@@ -101,6 +101,8 @@ namespace SysDoctor.Scripts
                 "48 - USBDeview",
                 "49 - Sumatra PDF",
                 "50 - Notepad++",
+                "51 - Hardower Monitor",
+                "52 - Clonezilla",
                 "0 - Voltar"
             };
         }
@@ -364,6 +366,16 @@ namespace SysDoctor.Scripts
                     nome = "Notepad++";
                     url = "https://notepad-plus-plus.org/downloads/";
                     categoria = "Utilitários Diversos";
+                    break;
+                case 51:
+                    nome = "Hardower Monitor";
+                    url = "https://openhardwaremonitor.org/downloads/";
+                    categoria = "Diagnóstico e Monitoramento";
+                    break;
+                case 52:
+                    nome = "Clonezilla";
+                    url = "https://clonezilla.org/downloads.php";
+                    categoria = "Backup e Recuperação";
                     break;
                 default:
                     AnsiConsole.MarkupLine("[red]❌ Opção inválida![/]");
