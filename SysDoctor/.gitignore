@@ -1,0 +1,17 @@
+# Ignore ISO files
+*.iso
+
+# Ignore large binary files
+Scripts/ISOs/*.iso
+
+# Visual Studio / .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+.vs/
+
+# Temporary files
+*.tmp
+*.temp

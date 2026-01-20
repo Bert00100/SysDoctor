@@ -1,224 +1,189 @@
-# 🩺 SysDoctor — Windows Optimizer & Repair Tool
+# 🛠️ SysDoctor - Reparador e Otimizador de Windows
 
-![Windows](https://img.shields.io/badge/Windows-10%2F11-blue?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.11+-yellow?style=flat-square)
-![License](https://img.shields.io/badge/license-Free-green?style=flat-square)
+Um aplicativo console em C# que fornece ferramentas práticas para otimizar, limpar e diagnosticar seu sistema Windows.
 
----
+## 📋 Características
 
-## 📖 Sumário
+### 🔧 Ferramentas do Sistema
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Requisitos](#-requisitos)
-- [Funcionalidades Principais](#-funcionalidades-principais)
-- [Módulo de Otimização do Windows](#-módulo-de-otimização-do-windows)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Permissões e Execução](#-permissões-e-execução)
-- [Geração do Executável](#-geração-do-executável)
-- [Logs e Depuração](#-logs-e-depuração)
-- [Modo Pós-Instalação](#-modo-pós-instalação)
-- [Segurança e Reversão](#-segurança-e-reversão)
-- [Compatibilidade Testada](#-compatibilidade-testada)
-- [Dicas de Uso](#-dicas-de-uso)
-- [Licença](#-licença)
-- [Autor](#-autor)
+- **[1] Informação da Máquina** - Exibe detalhes do hardware e sistema operacional
+- **[3] Scanner do Windows** - Verifica a integridade do sistema Windows
+- **[5] SpeedTest** - Testa a velocidade de internet
+- **[7] Teste de Ping** - Realiza testes de conexão de rede
+- **[9] Otimizar Wifi** - Otimiza configurações de conectividade WiFi
+- **[11] Verificar Temperatura** - Monitora temperatura do processador
+- **[13] Criar Ponto de Restauração** - Cria ponto de restauração do sistema
+- **[15] Atualizar Windows** - Verifica e aplica atualizações do sistema
+- **[17] Pack de Programas** - Gerencia instalação de programas úteis
 
----
+### 🧹 Limpeza e Otimização
 
-## 📘 Sobre o Projeto
+- **[2] Limpar SSD/HD** - Remove arquivos temporários e desnecessários
+- **[4] Limpar Memória RAM** - Libera memória do sistema
+- **[6] Limpar Caches de Wifi/Ethernet** - Limpa cache de rede
+- **[8] Otimizar Ping** - Melhora latência de rede
+- **[10] Mapa de Conexão** - Visualiza conexões de rede ativas
+- **[12] Otimizar Windows** - Aplica várias otimizações do sistema
+- **[14] Configuração Pós-Instalação** - Configura sistema após nova instalação
+- **[16] Rodar Windows Defender** - Executa varredura de antivírus
 
-O **SysDoctor** é uma ferramenta de otimização e reparo para sistemas **Windows 10 e 11**, desenvolvida em **Python** com integração direta ao **PowerShell**.  
-Seu objetivo é oferecer um conjunto completo de **manutenção, diagnóstico e melhoria de desempenho** do sistema operacional — tudo via interface interativa e colorida no terminal.
+## 🚀 Como Usar
 
-🧩 Ele automatiza tarefas complexas do Windows: limpeza de disco, remoção de apps, ajustes de desempenho, atualização de drivers e muito mais.
+### Requisitos
 
----
+- Windows 10 ou superior
+- .NET 10.0 ou superior
+- PowerShell 5.1 ou superior
 
-## ⚙️ Requisitos
+### Instalação e Execução
 
-### 🧩 Dependências
+#### Opção 1: Executar com dotnet
 
-**Bibliotecas Python necessárias:**
-```bash
-pip install colorama psutil wmi speedtest-cli
+```powershell
+cd C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor
+dotnet run
 ```
 
-**Requisitos do sistema:**
-- Windows 10 ou 11 (64 bits)
-- PowerShell 5.1 ou superior
-- Acesso de **Administrador**
+#### Opção 2: Executar o arquivo compilado
 
----
+```powershell
+C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor\bin\Debug\net10.0\win-x64\SysDoctor.exe
+```
 
-## 🚀 Funcionalidades Principais
+#### Opção 3: Com privilégios de administrador (recomendado)
 
-| Código | Função | Descrição |
-|--------|---------|-----------|
-| **1** | Informação da Máquina | Exibe nome do PC, usuário, BIOS e interfaces de rede |
-| **2** | Limpar SSD/HD | Limpa arquivos temporários e desfragmenta discos |
-| **3** | Scanner do Windows | Executa `DISM /RestoreHealth` para reparar o sistema |
-| **4** | Limpar Sistema | Remove cache, logs e limpa RAM |
-| **5** | Speed Test | Mede velocidade de internet via `speedtest-cli` |
-| **6** | Limpar Rede | Reseta IP, DNS e Winsock |
-| **7** | Teste de Ping | Verifica latência com servidores DNS |
-| **8** | Otimizar Ping | Usa DnsJumper para reduzir latência |
-| **9** | Otimizar Wi-Fi | Ajusta parâmetros TCP/IP |
-| **10** | Mapa de Conexão | Rastreia rotas de rede (tracert) |
-| **11** | Monitorar Temperatura | Usa OpenHardwareMonitor para medir CPU e GPU |
-| **12** | Otimizar Windows | Acessa o menu de otimizações avançadas |
-| **13** | Ponto de Restauração | Cria restauração de sistema via PowerShell |
-| **14** | Pós-instalação | Executa scripts de configuração personalizados |
-| **15** | Atualizar Windows | Busca e agenda atualizações |
-| **16** | Windows Defender | Atualiza definições e executa verificação rápida |
+Abra o PowerShell como administrador e execute:
 
----
+```powershell
+cd C:\Users\Usuario\Documents\Python\SysDoctor\SysDoctor
+dotnet run
+```
 
-## 🧠 Módulo de Otimização do Windows
+### Menu de Navegação
 
-O **menu de otimização** reúne ajustes e políticas para reduzir o consumo de recursos, aumentar o desempenho e melhorar a privacidade do usuário.
+1. O programa exibe um menu interativo com duas colunas
+2. Digite o número correspondente à funcionalidade desejada
+3. Pressione Enter para executar
+4. Digite **0** para sair do programa
 
-| Código | Função | Descrição |
-|--------|---------|-----------|
-| **1** | Otimizar Energia | Ativa plano de alto desempenho |
-| **2** | Desativar Efeitos Visuais | Remove animações e transparências |
-| **3** | Otimizar ALT+TAB | Alterna entre modo clássico e moderno |
-| **4** | Desativar Telemetria | Bloqueia coleta de dados e rastreamento |
-| **5** | Desativar Serviços Inúteis | Desliga serviços não essenciais (Spooler, DiagTrack, etc.) |
-| **6** | Debloater | Remove apps padrão (Cortana, OfficeHub, OneDrive, etc.) |
-| **7** | Desativar Overlays | Desliga Game Bar e Game Mode |
-| **8** | Desativar UAC | Remove o prompt de Controle de Conta de Usuário |
-| **9** | Desativar Hibernação | Libera espaço e acelera inicialização |
-| **10** | Desativar Indexação | Para o serviço de busca e indexação de arquivos |
-| **11** | Desativar Hyper-V | Desativa virtualização nativa do Windows |
-| **12** | Desativar Aero Peek | Remove transparência da barra de tarefas |
-| **13** | Desativar Download Maps Manager | Desativa o serviço de mapas offline |
-| **14** | Desativar SmartScreen | Desativa filtro de downloads do Windows |
+### Privilégios de Administrador
 
----
+- ✅ O programa funciona **sem privilégios de administrador**
+- ⚠️ Algumas funcionalidades podem funcionar melhor com privilégios elevados
+- 🛡️ O status é exibido no topo: **Verde (com admin)** ou **Amarelo (sem admin)**
 
-## 🧩 Estrutura do Projeto
+## 📦 Estrutura do Projeto
 
 ```
 SysDoctor/
-│
-├── SysDoctor.exe            # Executável gerado via PyInstaller
-├── main.py                  # Código-fonte principal
-│
-├── Scripts/
-│   ├── Apps/
-│   │   ├── RamMap/
-│   │   ├── DNS/
-│   │   └── HardwareMonitor/
-│   ├── Install/
-│   └── ...
-│
-├── README.md
-└── requirements.txt
+├── Program.cs                 # Arquivo principal com menu
+├── GlobalUsings.cs            # Imports globais
+├── app.manifest               # Configuração de privilégios
+├── SysDoctor.csproj           # Arquivo de projeto
+├── Scripts/                   # Funcionalidades individuais
+│   ├── InfoMachine.cs         # Informações do sistema
+│   ├── ClearDisk.cs           # Limpeza de disco
+│   ├── ClearRAM.cs            # Limpeza de memória
+│   ├── SpeedTest.cs           # Teste de velocidade
+│   ├── TestPing.cs            # Teste de ping
+│   ├── OtmWindows.cs          # Otimizações do Windows
+│   ├── RunDefender.cs         # Windows Defender
+│   ├── UpdateWindows.cs       # Atualizações
+│   ├── MapNet.cs              # Mapa de rede
+│   ├── checkTemperature.cs    # Temperatura do sistema
+│   └── ...outros scripts
+└── bin/
+    └── Debug/
+        └── net10.0/
+            └── win-x64/       # Executável compilado
 ```
 
----
+## 🔧 Tratamento de Erros
 
-## 🔐 Permissões e Execução
+O programa inclui tratamento robusto de exceções:
 
-A maioria das funções requer **privilégios administrativos**.
+- **UnauthorizedAccessException** - Quando faltam privilégios para uma operação
+- **Mensagens amigáveis** - Informam ao usuário o que aconteceu
+- **Continuidade** - O programa continua funcionando mesmo se uma funcionalidade falhar
 
-```python
-def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
-```
-
-Se não estiver executando como administrador, o programa tenta se elevar automaticamente via:
-
-```python
-ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
-```
-
----
-
-## 🛠️ Geração do Executável
-
-Compile o SysDoctor com privilégios administrativos:
-
-```bash
-pyinstaller --onefile --uac-admin main.py -n sysdoctor
-```
-
-Isso garante que o `.exe` sempre solicitará elevação UAC ao iniciar.
-
----
-
-## 🧾 Logs e Depuração
-
-O SysDoctor utiliza funções de **debug estruturadas**:
-
-```python
-debug_step(n, msg)      # Exibe a etapa atual
-debug_success(msg)      # Mostra sucesso
-debug_error(msg)        # Indica falha
-debug_warning(msg)      # Exibe aviso
-header(title)           # Cabeçalho visual
-txt_info(label, value)  # Exibe valores formatados
-```
-
-🟢 **Saída visualmente clara e colorida** com `colorama` — ideal para auditoria de processos.
-
----
-
-## 🧰 Modo Pós-Instalação
-
-Permite execução de scripts `.ps1` personalizados após uma reinstalação do Windows.  
-Scripts são carregados automaticamente da pasta:
+### Exemplo de Erro Tratado
 
 ```
-Scripts/Install/
+❌ ACESSO NEGADO
+
+⚠️  A funcionalidade 'Limpeza de Disco' requer privilégios de administrador!
+
+💡 Para usar esta funcionalidade:
+1. Execute o programa como administrador
+2. Ou tente novamente com privilégios elevados
 ```
 
----
+## 🎨 Interface
 
-## 🛡️ Segurança e Reversão
+O programa utiliza **Spectre.Console** para:
 
-Todas as funções críticas possuem **modo reversão**, permitindo restaurar configurações originais do Windows:
+- ✨ Cores e emojis no console
+- 📊 Barras de progresso
+- 🎯 Layout centralizado
+- 📋 Tabelas organizadas
 
+## ⚙️ Configuração
+
+### Manifest (app.manifest)
+
+- Configurado como `asInvoker` para permitir execução sem privilégios obrigatórios
+- Suporta UTF-8 e caracteres especiais
+- Compatível com Windows 10 e superiores
+
+### Dependências Principais
+
+- **Spectre.Console** - Interface de console avançada
+- **System.Management** - Acesso a informações do sistema
+- **.NET 10.0** - Framework base
+
+## 🐛 Troubleshooting
+
+### Problema: "The requested operation requires elevation"
+
+**Solução:** Abra o PowerShell como administrador e execute novamente
+
+### Problema: Emojis não aparecem
+
+**Solução:** O programa tenta configurar UTF-8 automaticamente. Se não funcionar, habilite UTF-8 no Windows:
+
+```powershell
+[System.Environment]::SetEnvironmentVariable('DOTNET_System_Globalization_Invariant', 'false', 'User')
 ```
-[1] - Desativar
-[2] - Reverter (Ativar)
-```
+
+### Problema: Script específico não funciona
+
+**Verificação:**
+
+1. Verifique se tem privilégios adequados
+2. Leia a mensagem de erro exibida
+3. Tente executar como administrador
+
+## 📝 Notas de Desenvolvimento
+
+- Linguagem: **C# 12**
+- Target Framework: **.NET 10.0**
+- Runtime: **win-x64**
+- Padrão: **async/await** para operações assíncronas
+- Logs: Console apenas (sem arquivo de log)
+
+## 🔐 Segurança
+
+- ✅ Verifica permissões antes de operações críticas
+- ✅ Mensagens de aviso antes de limpeza
+- ✅ Sem modificação de arquivos de sistema críticos
+- ✅ Suporta execução limitada sem admin
+
+## 📞 Suporte
+
+Para reportar bugs ou sugerir melhorias, entre em contato com o desenvolvedor.
 
 ---
 
-## 💻 Compatibilidade Testada
-
-| Sistema | Compatível | Observações |
-|----------|-------------|-------------|
-| Windows 10 Pro | ✅ | Totalmente funcional |
-| Windows 11 Home | ✅ | Pode exigir confirmação UAC |
-| Windows Server | ⚠️ | Alguns módulos indisponíveis |
-
----
-
-## 💡 Dicas de Uso
-
-- Execute **sempre como administrador**  
-- Feche programas pesados antes de usar o **limpador de RAM**  
-- Use o menu `[12] Otimizar Windows` para configurar desempenho global  
-- Evite usar o **Debloater** em ambientes corporativos  
-
----
-
-## 📦 Licença
-
-Uso **Exclusivo Para Code Suporte and Hub**.  
-Distribuição comercial requer autorização do autor.
-
----
-
-## 🧑‍💻 Autor
-
-**Felipe B. Franceschini**  
-🧠 Desenvolvedor Python & Otimizador de Sistemas  
-💬 “Feito para manter o Windows leve, limpo e rápido — do jeito certo.”
-
----
+**Versão:** 1.0  
+**Última atualização:** Dezembro 2025  
+**Desenvolvedor:** Bert00100
